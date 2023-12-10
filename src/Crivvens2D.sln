@@ -3,9 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crivvens2D.Core", "Crivvens2D.Core\Crivvens2D.Core.csproj", "{2508D46F-FB0E-42BA-8966-3811B90EAEA8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Crivvens2D.Core", "Crivvens2D.Core\Crivvens2D.Core.csproj", "{2508D46F-FB0E-42BA-8966-3811B90EAEA8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crivvens2D.Core.Tests", "Crivvens2D.Core.Tests\Crivvens2D.Core.Tests.csproj", "{14A4C1C0-35EE-4144-865E-9F85C8C52455}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Crivvens2D.Core.Tests", "Crivvens2D.Core.Tests\Crivvens2D.Core.Tests.csproj", "{14A4C1C0-35EE-4144-865E-9F85C8C52455}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{9F8D0FEC-28D0-4DFC-8D4D-62BA0FD99D83}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		Directory.Build.props = Directory.Build.props
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

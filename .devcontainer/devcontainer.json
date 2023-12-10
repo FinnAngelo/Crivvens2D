@@ -1,0 +1,23 @@
+{
+    // Commented out the image to speed codespace creation
+    // "image": "mcr.microsoft.com/devcontainers/universal:2.5.1",
+
+    // Run Bash script in .devcontainer directory
+    // "postCreateCommand": "/bin/bash ./.devcontainer/post-create.sh > ./.devcontainer/post-create.log",
+    
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-dotnettools.csdevkit"
+                // "ms-dotnettools.csharp",
+                // "kreativ-software.csharpextensions",
+                // "formulahendry.auto-rename-tag",
+                // "formulahendry.dotnet-test-explorer",
+                // "PKief.material-icon-theme",
+                // "patcx.vscode-nuget-gallery",
+                // "alexcvzz.vscode-sqlite",
+                // "ms-vscode.live-server"
+            ]
+        }
+    }
+}

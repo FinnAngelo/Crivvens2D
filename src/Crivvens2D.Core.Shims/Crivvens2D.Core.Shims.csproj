@@ -10,8 +10,4 @@
 		<None Remove="**/*.js" />
 	</ItemGroup>
 
-	<ItemGroup>
-		<ProjectReference Include="..\Crivvens2D.Core.Shims\Crivvens2D.Core.Shims.csproj" />
-	</ItemGroup>
-
 </Project>

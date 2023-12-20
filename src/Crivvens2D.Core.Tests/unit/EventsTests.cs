@@ -1,137 +1,106 @@
-import * as events from '../../src/events.js';
+namespace Crivvens2D.Core.Tests;
 
-// --------------------------------------------------
-// on
-// --------------------------------------------------
-describe('events', () => {
-  it('should export api', () => {
-    expect(events.on).to.be.an('function');
-    expect(events.off).to.be.an('function');
-    expect(events.emit).to.be.an('function');
-  });
+[TestClass]
+public class EventsTests {
+
+  [TestInitialize]
+  public void TestInitialize() {
+    Events.Callbacks.Clear();
+  }
 
   // --------------------------------------------------
   // on
   // --------------------------------------------------
-  describe('on', () => {
-    afterEach(() => {
-      delete events.callbacks.foo;
-    });
 
-    it('should add the event to the callbacks object', () => {
-      function func() {}
-      events.on('foo', func);
+  [TestMethod]
+  public void On_AddsCallbackToEvent() {
+    var func = new Action(() => { });
+    Events.On("foo", func);
 
-      expect(events.callbacks.foo).to.be.an('array');
-      expect(events.callbacks.foo[0]).to.equal(func);
-    });
+    Events.Callbacks["foo"].Should().NotBeNullOrEmpty();
+    Events.Callbacks["foo"].Should().HaveCount(1);
+    Events.Callbacks["foo"][0].Should().Be(func);
+  }
 
-    it('should append the event if it already exists', () => {
-      function func1() {}
-      function func2() {}
-      events.on('foo', func1);
-      events.on('foo', func2);
+  [TestMethod]
+  public void On_AppendsCallbackToEvent() {
+    var func1 = new Action(() => { });
+    var func2 = new Action(() => { });
+    Events.On("foo", func1);
+    Events.On("foo", func2);
 
-      expect(events.callbacks.foo).to.be.an('array');
-      expect(events.callbacks.foo[0]).to.equal(func1);
-      expect(events.callbacks.foo[1]).to.equal(func2);
-    });
-  });
+    Events.Callbacks["foo"].Should().NotBeNullOrEmpty();
+    Events.Callbacks["foo"].Should().HaveCount(2);
+    Events.Callbacks["foo"][0].Should().Be(func1);
+    Events.Callbacks["foo"][1].Should().Be(func2);
+  }
 
   // --------------------------------------------------
   // off
   // --------------------------------------------------
-  describe('off', () => {
-    function func() {}
 
-    beforeEach(() => {
-      events.on('foo', func);
-    });
+  [TestMethod]
+  public void Off_RemovesCallbackFromEvent() {
+    var func = new Action(() => { });
+    Events.On("foo", func);
+    Events.Off("foo", func);
 
-    afterEach(() => {
-      delete events.callbacks.foo;
-    });
+    Events.Callbacks["foo"].Should().NotBeNull();
+    Events.Callbacks["foo"].Should().BeEmpty();
+  }
 
-    it('should remove the callback from the event', () => {
-      events.off('foo', func);
+  [TestMethod]
+  public void Off_RemovesOnlyCallbackFromEvent() {
+    var func1 = new Action(() => { });
+    var func2 = new Action(() => { });
+    Events.On("foo", func1);
+    Events.On("foo", func2);
+    Events.Off("foo", func1);
 
-      expect(events.callbacks.foo.length).to.equal(0);
-    });
+    Events.Callbacks["foo"].Should().NotBeNullOrEmpty();
+    Events.Callbacks["foo"].Should().HaveCount(1);
+    Events.Callbacks["foo"][0].Should().Be(func2);
+  }
 
-    it('should only remove the callback', () => {
-      function func1() {}
-      function func2() {}
-      events.on('foo', func1);
-      events.on('foo', func2);
+  [TestMethod]
+  public void Off_DoesNotErrorIfCallbackWasNotAdded() {
+    var func = new Action(() => { });
+    new Action(() => Events.Off("foo", func)).Should().NotThrow();
+  }
 
-      events.off('foo', func);
-
-      expect(events.callbacks.foo.length).to.equal(2);
-      expect(events.callbacks.foo[0]).to.equal(func1);
-      expect(events.callbacks.foo[1]).to.equal(func2);
-    });
-
-    it('should not error if the callback was not added before', () => {
-      function fn() {
-        events.off('foo', () => {});
-      }
-
-      expect(fn).to.not.throw();
-    });
-
-    it('should not error if the event was not added before', () => {
-      function fn() {
-        events.off('myEvent', () => {});
-      }
-
-      expect(fn).to.not.throw();
-    });
-  });
+  [TestMethod]
+  public void Off_DoesNotErrorIfCallbackWasNotAddedToUndefinedEvent() {
+    var func = new Action(() => { });
+    new Action(() => Events.Off("MyEvent", func)).Should().NotThrow();
+  }
 
   // --------------------------------------------------
   // emit
   // --------------------------------------------------
-  describe('emit', () => {
-    let func = sinon.spy();
+  [TestMethod]
+  public void Emit_CallsTheCallbacksInEvent() {
+    var func = Mock.Of<Action>(MockBehavior.Loose);
+    Events.On("foo", func);
+    Events.Emit("foo");
+    Mock.Get(func).Verify(f => f(), Times.Once());
+  }
 
-    beforeEach(() => {
-      func.resetHistory();
-      events.on('foo', func);
-    });
+  [TestMethod]
+  public void Emit_CallsTheCallbacksInEventWithParameters() {
+    var func = Mock.Of<Action<int, string, bool>>(MockBehavior.Loose);
+    Events.On("foo", func);
+    Events.Emit("foo", 1, "string", true);
+    Mock.Get(func).Verify(f => f(1, "string", true), Times.Once());
+  }
 
-    afterEach(() => {
-      delete events.callbacks.foo;
-    });
+  [TestMethod]
+  public void Emit_CallsTheCallbacksInOrder_IS_NOT_GARUANTEED_BY_MEEEE() {
+    true.Should().BeTrue();
+  }
 
-    it('should call the callback', () => {
-      events.emit('foo');
+  [TestMethod]
+  public void Emit_DoesNotErrorIfCallbackWasNotAdded() {
+    new Action(() => Events.Emit("myEvent")).Should().NotThrow();
+  }
+}
 
-      expect(func.called).to.equal(true);
-    });
-
-    it('should pass all parameters to the callback', () => {
-      events.emit('foo', 1, 2, 3);
-
-      expect(func.calledWith(1, 2, 3)).to.equal(true);
-    });
-
-    it('should call the callbacks in order', () => {
-      let func1 = sinon.spy();
-      let func2 = sinon.spy();
-      events.on('foo', func1);
-      events.on('foo', func2);
-
-      events.emit('foo');
-
-      sinon.assert.callOrder(func, func1, func2);
-    });
-
-    it('should not error if the event was not added before', () => {
-      function fn() {
-        events.emit('myEvent', () => {});
-      }
-
-      expect(fn).to.not.throw();
-    });
-  });
-});

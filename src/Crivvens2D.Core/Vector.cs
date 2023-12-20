@@ -1,4 +1,4 @@
-import { clamp } from './helpers.js';
+namespace Crivvens2D.Core;
 
 /**
  * A simple 2d vector object. Takes either separate `x` and `y` coordinates or a Vector-like object.
@@ -14,25 +14,25 @@ import { clamp } from './helpers.js';
  * @param {Number|{x: number, y: number}} [x=0] - X coordinate of the vector or a Vector-like object. If passing an object, the `y` param is ignored.
  * @param {Number} [y=0] - Y coordinate of the vector.
  */
-class Vector {
-  constructor(x = 0, y = 0, vec = {}) {
-    if (x.x != undefined) {
-      this.x = x.x;
-      this.y = x.y;
-    }
-    else {
-      this.x = x;
-      this.y = y;
-    }
+public class Vector : IPoint {
+
+  public Vector(IPoint x, Vector? clamp = null) : this(x.X, x.Y, clamp) { }
+
+  public Vector(double x, double y, Vector? clamp = null) {
+
+    this.X = x;
+    this.Y = y;
 
     // @ifdef VECTOR_CLAMP
     // preserve vector clamping when creating new vectors
-    if (vec._c) {
-      this.clamp(vec._a, vec._b, vec._d, vec._e);
+    if (clamp?._isClamped ?? false) {
+      var rx = this.X;
+      var ry = this.Y;
+      this.Clamp(clamp._xMinClamped, clamp._yMinClamped, clamp._xMaxClamped, clamp._yMaxClamped);
 
       // reset x and y so clamping takes effect
-      this.x = x;
-      this.y = y;
+      this.X = rx;
+      this.Y = ry;
     }
     // @endif
   }
@@ -44,9 +44,9 @@ class Vector {
    *
    * @param {Vector|{x: number, y: number}} vector - Vector to set coordinates from.
    */
-  set(vec) {
-    this.x = vec.x;
-    this.y = vec.y;
+  public void Set(IPoint vec) {
+    this.X = vec.X;
+    this.Y = vec.Y;
   }
 
   /**
@@ -58,8 +58,8 @@ class Vector {
    *
    * @returns {Vector} A new Vector instance whose value is the addition of the two vectors.
    */
-  add(vec) {
-    return new Vector(this.x + vec.x, this.y + vec.y, this);
+  public Vector Add(Vector vec) {
+    return new Vector(this.X + vec.X, this.Y + vec.Y, clamp: this);
   }
 
   // @ifdef VECTOR_SUBTRACT
@@ -72,8 +72,8 @@ class Vector {
    *
    * @returns {Vector} A new Vector instance whose value is the subtraction of the two vectors.
    */
-  subtract(vec) {
-    return new Vector(this.x - vec.x, this.y - vec.y, this);
+  public Vector Subtract(Vector vec) {
+    return new Vector(this.X - vec.X, this.Y - vec.Y, clamp: this);
   }
   // @endif
 
@@ -87,8 +87,8 @@ class Vector {
    *
    * @returns {Vector} A new Vector instance whose value is multiplied by the scalar.
    */
-  scale(value) {
-    return new Vector(this.x * value, this.y * value);
+  public Vector Scale(double value) {
+    return new Vector(this.X * value, this.Y * value);
   }
   // @endif
 
@@ -101,8 +101,10 @@ class Vector {
    * @returns {Vector} A new Vector instance whose value is the normalized vector.
    */
   // @see https://github.com/jed/140bytes/wiki/Byte-saving-techniques#use-placeholder-arguments-instead-of-var
-  normalize(length = this.length() || 1) {
-    return new Vector(this.x / length, this.y / length);
+  public Vector Normalize() => Normalize(this.Length());
+  public Vector Normalize(double length) {
+    var calcLength = (length == 0 ? 1 : length);
+    return new Vector((double) (this.X / calcLength), (double) (this.Y / calcLength));
   }
   // @endif
 
@@ -116,8 +118,8 @@ class Vector {
    *
    * @returns {Number} The dot product of the vectors.
    */
-  dot(vec) {
-    return this.x * vec.x + this.y * vec.y;
+  public double Dot(Vector vec) {
+    return this.X * vec.X + this.Y * vec.Y;
   }
   // @endif
 
@@ -129,8 +131,10 @@ class Vector {
    *
    * @returns {Number} The length of the vector.
    */
-  length() {
-    return Math.hypot(this.x, this.y);
+  private static double Hypot(double x, double y)
+    => Math.Sqrt((x * x) + (y * y));
+  public double Length() {
+    return Hypot(this.X, this.Y);
   }
   // @endif
 
@@ -144,8 +148,8 @@ class Vector {
    *
    * @returns {Number} The distance between the two vectors.
    */
-  distance(vec) {
-    return Math.hypot(this.x - vec.x, this.y - vec.y);
+  public double Distance(Vector vec) {
+    return Hypot(this.X - vec.X, this.Y - vec.Y);
   }
   // @endif
 
@@ -159,8 +163,8 @@ class Vector {
    *
    * @returns {Number} The angle (in radians) between the two vectors.
    */
-  angle(vec) {
-    return Math.acos(this.dot(vec) / (this.length() * vec.length()));
+  public double Angle(Vector vec) {
+    return Math.Acos(this.Dot(vec) / (this.Length() * vec.Length()));
   }
   // @endif
 
@@ -172,8 +176,8 @@ class Vector {
    *
    * @returns {Number} The angle (in radians) of the vector.
    */
-  direction() {
-    return Math.atan2(this.y, this.x);
+  public double Direction() {
+    return Math.Atan2(this.Y, this.X);
   }
   // @endif
 
@@ -204,12 +208,17 @@ class Vector {
    * @param {Number} xMax - Maximum x value.
    * @param {Number} yMax - Maximum y value.
    */
-  clamp(xMin, yMin, xMax, yMax) {
-    this._c = true;
-    this._a = xMin;
-    this._b = yMin;
-    this._d = xMax;
-    this._e = yMax;
+  private bool _isClamped = false;
+  private double _xMinClamped = 0;
+  private double _yMinClamped = 0;
+  private double _xMaxClamped = 0;
+  private double _yMaxClamped = 0;
+  public void Clamp(double xMin, double yMin, double xMax, double yMax) {
+    _isClamped = true;
+    _xMinClamped = xMin;
+    _yMinClamped = yMin;
+    _xMaxClamped = xMax;
+    _yMaxClamped = yMax;
   }
 
   /**
@@ -217,8 +226,12 @@ class Vector {
    * @memberof Vector
    * @property {Number} x
    */
-  get x() {
-    return this._x;
+  private double _x = 0; // Waiting for c# 13 with field
+  public double X {
+    get => _x;
+    set {
+      _x = _isClamped ? Helpers.Clamp(_xMinClamped, _xMaxClamped, value) : value;
+    }
   }
 
   /**
@@ -226,21 +239,13 @@ class Vector {
    * @memberof Vector
    * @property {Number} y
    */
-  get y() {
-    return this._y;
+
+  private double _y = 0;// Waiting for C# 13 with field
+  public double Y {
+    get => _y;
+    set => _y = _isClamped ? Helpers.Clamp(_yMinClamped, _yMaxClamped, value) : value;
   }
 
-  set x(value) {
-    this._x = this._c ? clamp(this._a, this._d, value) : value;
-  }
-
-  set y(value) {
-    this._y = this._c ? clamp(this._b, this._e, value) : value;
-  }
   // @endif
 }
 
-export default function factory() {
-  return new Vector(...arguments);
-}
-export { Vector as VectorClass };

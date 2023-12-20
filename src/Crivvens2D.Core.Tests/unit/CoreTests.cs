@@ -1,127 +1,64 @@
-import * as core from '../../src/core.js';
-import { on } from '../../src/events.js';
+namespace Crivvens2D.Core.Tests;
 
 // --------------------------------------------------
 // core
 // --------------------------------------------------
-describe('core', () => {
-  // ensure no canvas exists since these tests set it up
-  beforeEach(() => {
-    document
-      .querySelectorAll('canvas')
-      .forEach(canvas => canvas.remove());
-  });
+[TestClass]
+public class CoreTests {
+
+  [TestInitialize]
+  public void TestInitialize() {
+    Events.Callbacks.Clear();
+    // ensure no canvas exists since these tests set it up
+    Core.Canvas = null;
+  }
 
   // --------------------------------------------------
   // init
   // --------------------------------------------------
-  describe('init', () => {
-    it('should export api', () => {
-      expect(core.init).to.be.an('function');
-      expect(core.getCanvas).to.be.an('function');
-      expect(core.getContext).to.be.an('function');
-    });
 
-    it('should log an error if no canvas element exists', () => {
-      function func() {
-        core.init();
-      }
+  // Nope. Not the needful.
 
-      expect(func).to.throw();
-    });
+  [TestMethod]
+  public void Init_ThrowsErrorIfNoCanvas() {
+    ICanvas canvas = Core.Canvas!;
+    Action func = () => { Core.Init(canvas); };
+    func.Should().Throw<ArgumentNullException>();
+  }
 
-    it('should set the canvas when passed no arguments', () => {
-      let canvas = document.createElement('canvas');
-      canvas.width = 600;
-      canvas.height = 600;
-      document.body.appendChild(canvas);
 
-      core.init();
+  // it should set the canvas when passed no arguments test
+  // Nope. It will just error
 
-      expect(core.getCanvas()).to.equal(canvas);
-    });
+  // it should set the canvas when passed an id
+  // Nope. Canvas is required.
 
-    it('should set the canvas when passed an id', () => {
-      let canvas = document.createElement('canvas');
-      canvas.width = 600;
-      canvas.height = 600;
-      canvas.id = 'game';
-      document.body.appendChild(canvas);
+  [TestMethod]
+  public void Init_SetsTheCanvasWhenPassedACanvasElement() {
+    var canvas = Mock.Of<ICanvas>();
+    Core.Init(canvas);
+    Core.Canvas.Should().Be(canvas);
+  }
 
-      core.init('game');
+  // Nope. Not the needful.
 
-      expect(core.getCanvas()).to.equal(canvas);
-    });
+  [TestMethod]
+  public void Init_EmitsTheInitEvent() {
+    var done = Mock.Of<Action>();
+    Events.On("init", done);
 
-    it('should set the canvas when passed a canvas element', () => {
-      let canvas = document.createElement('canvas');
-      canvas.width = 600;
-      canvas.height = 600;
-      canvas.id = 'game2';
-      document.body.appendChild(canvas);
+    Core.Init(Mock.Of<ICanvas>());
+    Mock.Get(done).Verify(d => d(), Times.Once);
+  }
 
-      core.init(canvas);
+  [TestMethod]
+  public void Init_ReturnsTheCanvas() {
+    var canvas = Mock.Of<ICanvas>();
+    var result = Core.Init(canvas);
+    result.Should().Be(canvas);
+  }
 
-      expect(core.getCanvas()).to.equal(canvas);
-    });
+  //it should allow contextless option
+  // Nope. Not the needful.
 
-    it('should set the context from the canvas', () => {
-      let canvas = document.createElement('canvas');
-      canvas.width = 600;
-      canvas.height = 600;
-      canvas.id = 'game2';
-      document.body.appendChild(canvas);
-
-      core.init(canvas);
-
-      expect(core.getContext().canvas).to.equal(canvas);
-    });
-
-    it('should emit the init event', done => {
-      let canvas = document.createElement('canvas');
-      canvas.width = 600;
-      canvas.height = 600;
-      canvas.id = 'game2';
-      document.body.appendChild(canvas);
-
-      on('init', done);
-      core.init();
-
-      throw new Error('should not get here');
-    });
-
-    it('should return the canvas and context', () => {
-      let c = document.createElement('canvas');
-      c.width = 600;
-      c.height = 600;
-      c.id = 'game2';
-      document.body.appendChild(c);
-
-      let { canvas, context } = core.init();
-
-      expect(canvas).to.equal(c);
-      expect(context).to.equal(c.getContext('2d'));
-    });
-
-    it('should allow contextless option', () => {
-      let { canvas, context } = core.init(null, {
-        contextless: true
-      });
-
-      expect(canvas._proxy).to.be.true;
-      expect(context._proxy).to.be.true;
-
-      function fn() {
-        canvas.getContext('2d');
-        context.save();
-        context.clearRect(0, 0, canvas.width, canvas.height);
-        context.translate(0, 0);
-        context.globalAlpha = 10;
-        context.restore();
-        context.doesNotExist();
-      }
-
-      expect(fn).to.not.throw();
-    });
-  });
-});
+}

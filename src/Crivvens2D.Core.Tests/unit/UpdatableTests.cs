@@ -1,331 +1,247 @@
-import Updatable from '../../src/updatable.js';
-import Vector, { VectorClass } from '../../src/vector.js';
-
+//import Updatable from '../../src/updatable.js';
+//import Vector, { VectorClass } from '../../src/vector.js';
+namespace Crivvens2D.Core.Tests;
 // test-context:start
-let testContext = {
-  GAMEOBJECT_VELOCITY: true,
-  GAMEOBJECT_ACCELERATION: true,
-  GAMEOBJECT_TTL: true,
-  VECTOR_SCALE: true
-};
+//let testContext = {
+//  GAMEOBJECT_VELOCITY: true,
+//  GAMEOBJECT_ACCELERATION: true,
+//  GAMEOBJECT_TTL: true,
+//  VECTOR_SCALE: true
+//};
 // test-context:end
 
 // --------------------------------------------------
 // updatable
 // --------------------------------------------------
-describe(
-  'updatable with context: ' + JSON.stringify(testContext, null, 4),
-  () => {
-    let object;
-    beforeEach(() => {
-      object = new Updatable();
-    });
-
-    // --------------------------------------------------
-    // constructor
-    // --------------------------------------------------
-    describe('constructor', () => {
-      let spy;
-      afterEach(() => {
-        spy.restore();
-      });
-
-      it('should call init', () => {
-        spy = sinon.spy(Updatable.prototype, 'init');
-
-        let props = {};
-        object = new Updatable(props);
-
-        expect(spy.calledWith(props)).to.be.true;
-      });
-    });
-
-    // --------------------------------------------------
-    // init
-    // --------------------------------------------------
-    describe('init', () => {
-      it('should default position', () => {
-        expect(object.position instanceof VectorClass).to.be.true;
-        expect(object.position.x).to.equal(0);
-        expect(object.position.y).to.equal(0);
-      });
-
-      if (testContext.GAMEOBJECT_VELOCITY) {
-        it('should default velocity', () => {
-          expect(object.velocity instanceof VectorClass).to.be.true;
-          expect(object.velocity.x).to.equal(0);
-          expect(object.velocity.y).to.equal(0);
-        });
-      } else {
-        it('should not have velocity', () => {
-          expect(object.velocity).to.not.exist;
-        });
-      }
-
-      if (testContext.GAMEOBJECT_ACCELERATION) {
-        it('should default acceleration', () => {
-          expect(object.acceleration instanceof VectorClass).to.be
-            .true;
-          expect(object.acceleration.x).to.equal(0);
-          expect(object.acceleration.y).to.equal(0);
-        });
-      } else {
-        it('should not have acceleration', () => {
-          expect(object.acceleration).to.not.exist;
-        });
-      }
-
-      if (testContext.GAMEOBJECT_TTL) {
-        it('should default ttl', () => {
-          expect(object.ttl).to.equal(Infinity);
-        });
-      } else {
-        it('should not have ttl', () => {
-          expect(object.ttl).to.not.exist;
-        });
-      }
-
-      if (testContext.GAMEOBJECT_VELOCITY) {
-        it('should set dx and dy properties', () => {
-          object = new Updatable({ dx: 10, dy: 20 });
-
-          expect(object.velocity.x).to.equal(10);
-          expect(object.velocity.y).to.equal(20);
-        });
-      }
-
-      if (testContext.GAMEOBJECT_ACCELERATION) {
-        it('should set ddx and ddy properties', () => {
-          object = new Updatable({ ddx: 10, ddy: 20 });
-
-          expect(object.acceleration.x).to.equal(10);
-          expect(object.acceleration.y).to.equal(20);
-        });
-      }
-
-      if (testContext.GAMEOBJECT_TTL) {
-        it('should set ttl property', () => {
-          object = new Updatable({ ttl: 20 });
-
-          expect(object.ttl).to.equal(20);
-        });
-      }
-
-      it('should set any property', () => {
-        object = new Updatable({ myProp: 'foo' });
-
-        expect(object.myProp).to.equal('foo');
-      });
-    });
-
-    // --------------------------------------------------
-    // velocity
-    // --------------------------------------------------
-    if (testContext.GAMEOBJECT_VELOCITY) {
-      describe('velocity', () => {
-        it('should set the velocity x property', () => {
-          object.dx = 10;
-
-          expect(object.velocity.x).to.equal(10);
-        });
-
-        it('should return the velocity x property', () => {
-          object.velocity.x = 10;
-
-          expect(object.dx).to.equal(10);
-        });
-
-        it('should set the velocity y property', () => {
-          object.dy = 10;
-
-          expect(object.velocity.y).to.equal(10);
-        });
-
-        it('should return the velocity y property', () => {
-          object.velocity.y = 10;
-
-          expect(object.dy).to.equal(10);
-        });
-      });
-    }
-
-    // --------------------------------------------------
-    // acceleration
-    // --------------------------------------------------
-    if (testContext.GAMEOBJECT_ACCELERATION) {
-      describe('acceleration', () => {
-        it('should set the acceleration x property', () => {
-          object.ddx = 10;
-
-          expect(object.acceleration.x).to.equal(10);
-        });
-
-        it('should return the acceleration x property', () => {
-          object.acceleration.x = 10;
-
-          expect(object.ddx).to.equal(10);
-        });
-
-        it('should set the acceleration y property', () => {
-          object.ddy = 10;
-
-          expect(object.acceleration.y).to.equal(10);
-        });
-
-        it('should return the acceleration y property', () => {
-          object.acceleration.y = 10;
-
-          expect(object.ddy).to.equal(10);
-        });
-      });
-    }
-
-    // --------------------------------------------------
-    // isAlive
-    // --------------------------------------------------
-    if (testContext.GAMEOBJECT_TTL) {
-      describe('isAlive', () => {
-        it('should return true if ttl is above 0', () => {
-          object.ttl = 20;
-
-          expect(object.isAlive()).to.be.true;
-        });
-
-        it('should return true if ttl is less than 0', () => {
-          object.ttl = 0;
-
-          expect(object.isAlive()).to.be.false;
-
-          object.ttl = -20;
-
-          expect(object.isAlive()).to.be.false;
-        });
-      });
-    }
-
-    // --------------------------------------------------
-    // update
-    // --------------------------------------------------
-    describe('update', () => {
-      it('should call the advance function', () => {
-        sinon.stub(object, 'advance');
-
-        object.update();
-
-        expect(object.advance.called).to.be.true;
-      });
-
-      it('should pass dt', () => {
-        sinon.stub(object, 'advance');
-
-        object.update(1 / 60);
-
-        expect(object.advance.calledWith(1 / 60)).to.be.true;
-      });
-    });
-
-    // --------------------------------------------------
-    // advance
-    // --------------------------------------------------
-    describe('advance', () => {
-      if (
-        testContext.GAMEOBJECT_VELOCITY &&
-        testContext.GAMEOBJECT_ACCELERATION
-      ) {
-        it('should add the acceleration to the velocity', () => {
-          object.velocity = Vector(5, 10);
-          object.acceleration = Vector(15, 20);
-
-          object.advance();
-
-          expect(object.velocity.x).to.equal(20);
-          expect(object.velocity.y).to.equal(30);
-        });
-
-        if (testContext.VECTOR_SCALE) {
-          it('should use dt to scale the acceleration', () => {
-            object.velocity = Vector(5, 10);
-            object.acceleration = Vector(10, 20);
-
-            object.advance(0.5);
-
-            expect(object.velocity.x).to.equal(10);
-            expect(object.velocity.y).to.equal(20);
-          });
-        } else {
-          it('should not use dt to scale the acceleration', () => {
-            object.velocity = Vector(5, 10);
-            object.acceleration = Vector(15, 20);
-
-            object.advance(0.5);
-
-            expect(object.velocity.x).to.equal(20);
-            expect(object.velocity.y).to.equal(30);
-          });
-        }
-      }
-
-      if (testContext.GAMEOBJECT_VELOCITY) {
-        it('should add the velocity to the position', () => {
-          object.position = Vector(5, 10);
-          object.velocity = Vector(15, 20);
-
-          object.advance();
-
-          expect(object.position.x).to.equal(20);
-          expect(object.position.y).to.equal(30);
-        });
-
-        if (testContext.VECTOR_SCALE) {
-          it('should use dt to scale the velocity', () => {
-            object.position = Vector(5, 10);
-            object.velocity = Vector(10, 20);
-
-            object.advance(0.5);
-
-            expect(object.position.x).to.equal(10);
-            expect(object.position.y).to.equal(20);
-          });
-        } else {
-          it('should not use dt to scale the velocity', () => {
-            object.position = Vector(5, 10);
-            object.velocity = Vector(15, 20);
-
-            object.advance(0.5);
-
-            expect(object.position.x).to.equal(20);
-            expect(object.position.y).to.equal(30);
-          });
-        }
-      } else {
-        it('should not modify the position', () => {
-          object.position = Vector(5, 10);
-          object.velocity = Vector(15, 20);
-
-          object.advance();
-
-          expect(object.position.x).to.equal(5);
-          expect(object.position.y).to.equal(10);
-        });
-      }
-
-      if (testContext.GAMEOBJECT_TTL) {
-        it('should update ttl', () => {
-          object.ttl = 10;
-
-          object.advance();
-
-          expect(object.ttl).to.equal(9);
-        });
-      } else {
-        it('should not modify the ttl', () => {
-          object.ttl = 10;
-
-          object.advance();
-
-          expect(object.ttl).to.equal(10);
-        });
-      }
-    });
+[TestClass]
+public class UpdatableTests {
+
+
+  // --------------------------------------------------
+  // constructor
+  // --------------------------------------------------
+  // Nope.
+
+  // --------------------------------------------------
+  // init
+  // --------------------------------------------------
+  [TestMethod]
+  public void New_HasDefaultPosition() {
+    var updatable = new Mock<Updatable>(null!, null!, null!, null!).Object;
+    updatable.Position.X.Should().Be(0);
+    updatable.Position.Y.Should().Be(0);
   }
-);
+
+  [TestMethod]
+  public void New_HasDefaultVelocity() {
+    var updatable = new Mock<Updatable>(null!, null!, null!, null!).Object;
+    updatable.Velocity.X.Should().Be(0);
+    updatable.Velocity.Y.Should().Be(0);
+  }
+
+  [TestMethod]
+  public void New_HasDefaultAcceleration() {
+    var updatable = new Mock<Updatable>(null!, null!, null!, null!).Object;
+    updatable.Acceleration.X.Should().Be(0);
+    updatable.Acceleration.Y.Should().Be(0);
+  }
+
+  [TestMethod]
+  public void New_HasDefaultTTL() {
+    var updatable = new Mock<Updatable>(null!, null!, null!, null!).Object;
+    updatable.TTL.Should().Be(int.MaxValue);
+  }
+
+  [TestMethod]
+  public void New_SetsVelocity() {
+    var updatable = new Mock<Updatable>(null!, new Vector(10, 20), null!, null!).Object;
+    updatable.dx.Should().Be(10);
+    updatable.dy.Should().Be(20);
+  }
+
+  [TestMethod]
+  public void New_SetsAcceleration() {
+    var updatable = new Mock<Updatable>(null!, null!, new Vector(10, 20), null!).Object;
+    updatable.ddx.Should().Be(10);
+    updatable.ddy.Should().Be(20);
+  }
+
+  [TestMethod]
+  public void New_SetsTTL() {
+    var updatable = new Mock<Updatable>(null!, null!, null!, 20).Object;
+    updatable.TTL.Should().Be(20);
+  }
+
+  [TestMethod]
+  public void New_SetsAnyProperty() {
+    // Nope.
+  }
+
+  // --------------------------------------------------
+  // velocity
+  // --------------------------------------------------
+  [TestMethod]
+  public void Velocity_SetsDX() {
+    var updatable = new Mock<Updatable>(null!, null!, null!, null!).Object;
+    updatable.dx = 10;
+    updatable.Velocity.X.Should().Be(10);
+  }
+
+  [TestMethod]
+  public void Velocity_GetsDX() {
+    var updatable = new Mock<Updatable>(null!, null!, null!, null!).Object;
+    updatable.Velocity.X = 10;
+    updatable.dx.Should().Be(10);
+  }
+
+  [TestMethod]
+  public void Velocity_SetsDY() {
+    var updatable = new Mock<Updatable>(null!, null!, null!, null!).Object;
+    updatable.dy = 10;
+    updatable.Velocity.Y.Should().Be(10);
+  }
+
+  [TestMethod]
+  public void Velocity_GetsDY() {
+    var updatable = new Mock<Updatable>(null!, null!, null!, null!).Object;
+    updatable.Velocity.Y = 10;
+    updatable.dy.Should().Be(10);
+  }
+
+  // --------------------------------------------------
+  // acceleration
+  // --------------------------------------------------
+
+  [TestMethod]
+  public void Acceleration_SetsDDX() {
+    var updatable = new Mock<Updatable>(null!, null!, null!, null!).Object;
+    updatable.ddx = 10;
+    updatable.Acceleration.X.Should().Be(10);
+  }
+
+  [TestMethod]
+  public void Acceleration_GetsDDX() {
+    var updatable = new Mock<Updatable>(null!, null!, null!, null!).Object;
+    updatable.Acceleration.X = 10;
+    updatable.ddx.Should().Be(10);
+  }
+
+  [TestMethod]
+  public void Acceleration_SetsDDY() {
+    var updatable = new Mock<Updatable>(null!, null!, null!, null!).Object;
+    updatable.ddy = 10;
+    updatable.Acceleration.Y.Should().Be(10);
+  }
+
+  [TestMethod]
+  public void Acceleration_GetsDDY() {
+    var updatable = new Mock<Updatable>(null!, null!, null!, null!).Object;
+    updatable.Acceleration.Y = 10;
+    updatable.ddy.Should().Be(10);
+  }
+
+  // --------------------------------------------------
+  // isAlive
+  // --------------------------------------------------
+
+  [TestMethod]
+  public void IsAlive_IsTrueIfTTLAboveZero() {
+    var updatable = new Mock<Updatable>(null!, null!, null!, null!).Object;
+    updatable.TTL = 20;
+    updatable.IsAlive.Should().BeTrue();
+  }
+
+  [TestMethod]
+  public void IsAlive_IsFalseIfTTLLessThanZero() {
+    var updatable = new Mock<Updatable>(null!, null!, null!, null!).Object;
+    updatable.TTL = 0;
+    updatable.IsAlive.Should().BeFalse();
+    updatable.TTL = -20;
+    updatable.IsAlive.Should().BeFalse();
+  }
+
+  // --------------------------------------------------
+  // update
+  // --------------------------------------------------
+  [TestMethod]
+  public void Update_WillCallAdvance() {
+    var mock = new Mock<Updatable>(MockBehavior.Strict, null!, null!, null!, null!);
+    mock.Setup(m => m.Advance(It.IsAny<double>()));
+    mock.Object.Update(0);
+    mock.Verify(u => u.Advance(It.IsAny<double>()), Times.Once);
+  }
+
+  [TestMethod]
+  public void Update_WillPassDTToAdvance() {
+    var mock = new Mock<Updatable>(MockBehavior.Strict, null!, null!, null!, null!);
+    mock.Setup(m => m.Advance(It.IsAny<double>()));
+    mock.Object.Update(1 / 60);
+    mock.Verify(u => u.Advance(1 / 60), Times.Once);
+  }
+
+  // --------------------------------------------------
+  // advance
+  // --------------------------------------------------
+  [TestMethod]
+  public void Advance_WillAddAccelerationToTheVelocity() {
+    var mock = new Mock<Updatable>(null!, null!, null!, null!);
+    mock.CallBase = true;
+    var updatable = mock.Object;
+    updatable.Velocity = new Vector(5, 10);
+    updatable.Acceleration = new Vector(15, 20);
+
+    updatable.Advance(0);
+    updatable.Velocity.X.Should().Be(20);
+    updatable.Velocity.Y.Should().Be(30);
+  }
+
+  [TestMethod]
+  public void Advance_WillUseDTToScaleTheAcceleration() {
+    var mock = new Mock<Updatable>(null!, null!, null!, null!);
+    mock.CallBase = true;
+    var updatable = mock.Object;
+    updatable.Velocity = new Vector(5, 10);
+    updatable.Acceleration = new Vector(10, 20);
+
+    updatable.Advance(0.5);
+    updatable.Velocity.X.Should().Be(10);
+    updatable.Velocity.Y.Should().Be(20);
+  }
+
+  [TestMethod]
+  public void Advance_WillAddVelocityToThePosition() {
+    var mock = new Mock<Updatable>(null!, null!, null!, null!);
+    mock.CallBase = true;
+    var updatable = mock.Object;
+    updatable.Position = new Vector(5, 10);
+    updatable.Velocity = new Vector(15, 20);
+
+    updatable.Advance(0);
+    updatable.Position.X.Should().Be(20);
+    updatable.Position.Y.Should().Be(30);
+  }
+
+  [TestMethod]
+  public void Advance_WillUseDTToScaleTheVelocity() {
+    var mock = new Mock<Updatable>(null!, null!, null!, null!);
+    mock.CallBase = true;
+    var updatable = mock.Object;
+    updatable.Position = new Vector(5, 10);
+    updatable.Velocity = new Vector(10, 20);
+
+    updatable.Advance(0.5);
+    updatable.Position.X.Should().Be(10);
+    updatable.Position.Y.Should().Be(20);
+  }
+
+  [TestMethod]
+  public void Advance_WillUpdateTTL() {
+    var mock = new Mock<Updatable>(null!, null!, null!, null!);
+    mock.CallBase = true;
+    var updatable = mock.Object;
+    updatable.TTL = 10;
+
+    updatable.Advance(0);
+    updatable.TTL.Should().Be(9);
+  }
+}

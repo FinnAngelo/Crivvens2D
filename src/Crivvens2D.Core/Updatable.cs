@@ -1,4 +1,5 @@
-import Vector from './vector.js';
+using Vector = Crivvens2D.Core.Vector;
+namespace Crivvens2D.Core;
 
 /**
  * This is a private class that is used just to help make the GameObject class more manageable and smaller.
@@ -9,12 +10,17 @@ import Vector from './vector.js';
  * acceleration
  * ttl
  */
-class Updatable {
-  constructor(properties) {
-    return this.init(properties);
-  }
+public abstract class Updatable {
+  public Vector Position { get; set; }
+  public Vector Velocity { get; set; }
+  public Vector Acceleration { get; set; }
+  public int TTL { get; set; } // Time to Live
 
-  init(properties = {}) {
+  public abstract void _pc();
+
+  // Nope
+
+  public Updatable(Vector? position = null, Vector? velocity = null, Vector? acceleration = null, int? ttl = null) {
     // --------------------------------------------------
     // defaults
     // --------------------------------------------------
@@ -25,7 +31,7 @@ class Updatable {
      * @memberof GameObject
      * @page GameObject
      */
-    this.position = Vector();
+    this.Position = position ?? new Vector();
 
     // --------------------------------------------------
     // optionals
@@ -38,7 +44,7 @@ class Updatable {
      * @property {Vector} velocity
      * @page GameObject
      */
-    this.velocity = Vector();
+    this.Velocity = velocity ?? new Vector();
     // @endif
 
     // @ifdef GAMEOBJECT_ACCELERATION
@@ -48,7 +54,7 @@ class Updatable {
      * @property {Vector} acceleration
      * @page GameObject
      */
-    this.acceleration = Vector();
+    this.Acceleration = acceleration ?? new Vector();
     // @endif
 
     // @ifdef GAMEOBJECT_TTL
@@ -58,11 +64,11 @@ class Updatable {
      * @property {Number} ttl
      * @page GameObject
      */
-    this.ttl = Infinity;
+    this.TTL = ttl ?? int.MaxValue;
     // @endif
 
     // add all properties to the object, overriding any defaults
-    Object.assign(this, properties);
+    //Object.assign(this, properties);
   }
 
   /**
@@ -73,8 +79,8 @@ class Updatable {
    *
    * @param {Number} [dt] - Time since last update.
    */
-  update(dt) {
-    this.advance(dt);
+  public void Update(double dt) {
+    this.Advance(dt);
   }
 
   /**
@@ -115,36 +121,36 @@ class Updatable {
    * @param {Number} [dt] - Time since last update.
    *
    */
-  advance(dt) {
+  public virtual void Advance(double dt) {
     // @ifdef GAMEOBJECT_VELOCITY
     // @ifdef GAMEOBJECT_ACCELERATION
-    let acceleration = this.acceleration;
+    var acceleration = this.Acceleration;
 
     // @ifdef VECTOR_SCALE
-    if (dt) {
-      acceleration = acceleration.scale(dt);
+    if (dt != 0) {
+      acceleration = acceleration.Scale(dt);
     }
     // @endif
 
-    this.velocity = this.velocity.add(acceleration);
+    this.Velocity = this.Velocity.Add(acceleration);
     // @endif
     // @endif
 
     // @ifdef GAMEOBJECT_VELOCITY
-    let velocity = this.velocity;
+    var velocity = this.Velocity;
 
     // @ifdef VECTOR_SCALE
-    if (dt) {
-      velocity = velocity.scale(dt);
+    if (dt != 0) {
+      velocity = velocity.Scale(dt);
     }
     // @endif
 
-    this.position = this.position.add(velocity);
+    this.Position = this.Position.Add(velocity);
     this._pc();
     // @endif
 
     // @ifdef GAMEOBJECT_TTL
-    this.ttl--;
+    this.TTL--;
     // @endif
   }
 
@@ -159,8 +165,9 @@ class Updatable {
    * @property {Number} dx
    * @page GameObject
    */
-  get dx() {
-    return this.velocity.x;
+  public double dx {
+    get => this.Velocity.X;
+    set => this.Velocity.X = value;
   }
 
   /**
@@ -169,16 +176,9 @@ class Updatable {
    * @property {Number} dy
    * @page GameObject
    */
-  get dy() {
-    return this.velocity.y;
-  }
-
-  set dx(value) {
-    this.velocity.x = value;
-  }
-
-  set dy(value) {
-    this.velocity.y = value;
+  public double dy {
+    get => this.Velocity.Y;
+    set => this.Velocity.Y = value;
   }
   // @endif
 
@@ -193,8 +193,9 @@ class Updatable {
    * @property {Number} ddx
    * @page GameObject
    */
-  get ddx() {
-    return this.acceleration.x;
+  public double ddx {
+    get => this.Acceleration.X;
+    set => this.Acceleration.X = value;
   }
 
   /**
@@ -203,16 +204,9 @@ class Updatable {
    * @property {Number} ddy
    * @page GameObject
    */
-  get ddy() {
-    return this.acceleration.y;
-  }
-
-  set ddx(value) {
-    this.acceleration.x = value;
-  }
-
-  set ddy(value) {
-    this.acceleration.y = value;
+  public double ddy {
+    get => this.Acceleration.Y;
+    set => this.Acceleration.Y = value;
   }
   // @endif
 
@@ -229,12 +223,11 @@ class Updatable {
    *
    * @returns {Boolean} `true` if the game objects [ttl](api/gameObject#ttl) property is above `0`, `false` otherwise.
    */
-  isAlive() {
-    return this.ttl > 0;
+  public bool IsAlive {
+    get => this.TTL > 0;
   }
   // @endif
 
-  _pc() {}
+  //_pc() { }
 }
 
-export default Updatable;

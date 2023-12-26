@@ -18,7 +18,7 @@ public class Vector : IPoint {
 
   public Vector(IPoint x, Vector? clamp = null) : this(x.X, x.Y, clamp) { }
 
-  public Vector(double x, double y, Vector? clamp = null) {
+  public Vector(double x = 0, double y = 0, Vector? clamp = null) {
 
     this.X = x;
     this.Y = y;

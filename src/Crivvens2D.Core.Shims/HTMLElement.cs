@@ -24,6 +24,7 @@ public interface ICanvasRenderingContext2D {
   void Rotate(double angle);
   void Translate(double x, double y);
   void Transform(double a, double b, double c, double d, double e, double f);
+  void Save();
 }
 
 public interface IPoint {

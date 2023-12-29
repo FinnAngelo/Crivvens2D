@@ -39,19 +39,19 @@ namespace Crivvens2D.Core;
 //  * @param {...*} properties.props - Any additional properties you need added to the game object. For example, if you pass `gameObject({type: 'player'})` then the game object will also have a property of the same name and value. You can pass as many additional properties as you want.
 //  */
 public abstract partial class GameObject : Updatable {
-//   /**
-//    * @docs docs/api_docs/gameObject.js
-//    */
+  //   /**
+  //    * @docs docs/api_docs/gameObject.js
+  //    */
 
-//   /**
-//    * Use this function to reinitialize a game object. It takes the same properties object as the constructor. Useful it you want to repurpose a game object.
-//    * @memberof GameObject
-//    * @function init
-//    *
-//    * @param {Object} properties - Properties of the game object.
-//    */
+  //   /**
+  //    * Use this function to reinitialize a game object. It takes the same properties object as the constructor. Useful it you want to repurpose a game object.
+  //    * @memberof GameObject
+  //    * @function init
+  //    *
+  //    * @param {Object} properties - Properties of the game object.
+  //    */
   public GameObject(
-        // --------------------------------------------------
+    // --------------------------------------------------
     // defaults
     // --------------------------------------------------
 
@@ -74,10 +74,10 @@ public abstract partial class GameObject : Updatable {
      * @memberof GameObject
      * @property {CanvasRenderingContext2D} context
      */
-    //context = getContext(),
+    Context context, // = getContext(),
 
     Action render,// = this.draw,
-    Action update,// = this.advance,
+    Action<double> update,// = this.advance,
 
     // --------------------------------------------------
     // optionals
@@ -95,8 +95,8 @@ public abstract partial class GameObject : Updatable {
      * @memberof GameObject
      * @property {GameObject[]} children
      */
-    GameObject[] children,// = [],
-    // @endif
+    List<GameObject> children,// = [],
+                              // @endif
 
     // @ifdef GAMEOBJECT_ANCHOR
     /**
@@ -148,7 +148,7 @@ public abstract partial class GameObject : Updatable {
      * drawOrigin(gameObject);
      */
     Point anchor, // = { x: 0, y: 0 },
-    // @endif
+                  // @endif
 
     // @ifdef GAMEOBJECT_OPACITY
     /**
@@ -157,7 +157,7 @@ public abstract partial class GameObject : Updatable {
      * @property {Number} opacity
      */
     double opacity,// = 1,
-    // @endif
+                   // @endif
 
     // @ifdef GAMEOBJECT_ROTATION
     /**
@@ -166,7 +166,7 @@ public abstract partial class GameObject : Updatable {
      * @property {Number} rotation
      */
     double rotation,// = 0,
-    // @endif
+                    // @endif
 
     // @ifdef GAMEOBJECT_SCALE
     /**
@@ -182,9 +182,9 @@ public abstract partial class GameObject : Updatable {
      * @property {Number} scaleY
      */
     double scaleY // = 1
-    // @endif
+                  // @endif
 
-    //...props
+  //...props
   ) {
     // @ifdef GAMEOBJECT_GROUP
     this._c = [];
@@ -196,26 +196,26 @@ public abstract partial class GameObject : Updatable {
     // `this.width` then no parent could provide a default value for
     // width)
     //super.init({
-      Width = width;
-      Height = height;
-      // context,
+    Width = width;
+    Height = height;
+    // context,
 
-      // @ifdef GAMEOBJECT_ANCHOR
-      Anchor = anchor;
-      // @endif
+    // @ifdef GAMEOBJECT_ANCHOR
+    Anchor = anchor;
+    // @endif
 
-      // @ifdef GAMEOBJECT_OPACITY
-      Opacity = opacity;
-      // @endif
+    // @ifdef GAMEOBJECT_OPACITY
+    Opacity = opacity;
+    // @endif
 
-      // @ifdef GAMEOBJECT_ROTATION
-      Rotation = rotation;
-      // @endif
+    // @ifdef GAMEOBJECT_ROTATION
+    Rotation = rotation;
+    // @endif
 
-      // @ifdef GAMEOBJECT_SCALE
-      ScaleX = scaleX;
-      ScaleY = scaleY;
-      // @endif
+    // @ifdef GAMEOBJECT_SCALE
+    ScaleX = scaleX;
+    ScaleY = scaleY;
+    // @endif
 
     //  ...props
     //});
@@ -239,433 +239,430 @@ public abstract partial class GameObject : Updatable {
     });
   }
 
-//   /**
-//    * Update all children
-//    */
-//   update(dt) {
-//     this._uf(dt);
+  /**
+   * Update all children
+   */
+  public virtual void update(double dt) {
+    this._uf(dt);
 
-//     // @ifdef GAMEOBJECT_GROUP
-//     this.children.map(child => child.update && child.update(dt));
-//     // @endif
-//   }
+    // @ifdef GAMEOBJECT_GROUP
+    this.children.ForEach(child => child?.update(dt));
+    // @endif
+  }
 
-//   /**
-//    * Render the game object and all children. Calls the game objects [draw()](api/gameObject#draw) function.
-//    * @memberof GameObject
-//    * @function render
-//    */
-//   render() {
-//     let context = this.context;
-//     context.save();
+  /**
+   * Render the game object and all children. Calls the game objects [draw()](api/gameObject#draw) function.
+   * @memberof GameObject
+   * @function render
+   */
+  public void render() {
+    var context = this.context;
+    context.Save();
 
-//     // 1) translate to position
-//     //
-//     // it's faster to only translate if one of the values is non-zero
-//     // rather than always translating
-//     // @see https://jsperf.com/translate-or-if-statement/2
-//     if (this.x || this.y) {
-//       context.translate(this.x, this.y);
-//     }
+    // 1) translate to position
+    //
+    // it's faster to only translate if one of the values is non-zero
+    // rather than always translating
+    // @see https://jsperf.com/translate-or-if-statement/2
+    if (this.X || this.y) {
+      context.translate(this.x, this.y);
+    }
 
-//     // @ifdef GAMEOBJECT_ROTATION
-//     // 3) rotate around the anchor
-//     //
-//     // it's faster to only rotate when set rather than always rotating
-//     // @see https://jsperf.com/rotate-or-if-statement/2
-//     if (this.rotation) {
-//       context.rotate(this.rotation);
-//     }
-//     // @endif
+    // @ifdef GAMEOBJECT_ROTATION
+    // 3) rotate around the anchor
+    //
+    // it's faster to only rotate when set rather than always rotating
+    // @see https://jsperf.com/rotate-or-if-statement/2
+    if (this.rotation) {
+      context.rotate(this.rotation);
+    }
+    // @endif
 
-//     // @ifdef GAMEOBJECT_SCALE
-//     // 4) scale after translation to position so object can be
-//     // scaled in place (rather than scaling position as well).
-//     //
-//     // it's faster to only scale if one of the values is not 1
-//     // rather than always scaling
-//     // @see https://jsperf.com/scale-or-if-statement/4
-//     if (this.scaleX != 1 || this.scaleY != 1) {
-//       context.scale(this.scaleX, this.scaleY);
-//     }
-//     // @endif
+    // @ifdef GAMEOBJECT_SCALE
+    // 4) scale after translation to position so object can be
+    // scaled in place (rather than scaling position as well).
+    //
+    // it's faster to only scale if one of the values is not 1
+    // rather than always scaling
+    // @see https://jsperf.com/scale-or-if-statement/4
+    if (this.scaleX != 1 || this.scaleY != 1) {
+      context.scale(this.scaleX, this.scaleY);
+    }
+    // @endif
 
-//     // @ifdef GAMEOBJECT_ANCHOR
-//     // 5) translate to the anchor so (0,0) is the top left corner
-//     // for the render function
-//     let anchorX = -this.width * this.anchor.x;
-//     let anchorY = -this.height * this.anchor.y;
+    // @ifdef GAMEOBJECT_ANCHOR
+    // 5) translate to the anchor so (0,0) is the top left corner
+    // for the render function
+    let anchorX = -this.width * this.anchor.x;
+    let anchorY = -this.height * this.anchor.y;
 
-//     if (anchorX || anchorY) {
-//       context.translate(anchorX, anchorY);
-//     }
-//     // @endif
+    if (anchorX || anchorY) {
+      context.translate(anchorX, anchorY);
+    }
+    // @endif
 
-//     // @ifdef GAMEOBJECT_OPACITY
-//     // it's not really any faster to gate the global alpha
-//     // @see https://jsperf.com/global-alpha-or-if-statement/1
-//     this.context.globalAlpha = this.opacity;
-//     // @endif
+    // @ifdef GAMEOBJECT_OPACITY
+    // it's not really any faster to gate the global alpha
+    // @see https://jsperf.com/global-alpha-or-if-statement/1
+    this.context.globalAlpha = this.opacity;
+    // @endif
 
-//     this._rf();
+    this._rf();
 
-//     // @ifdef GAMEOBJECT_ANCHOR
-//     // 7) translate back to the anchor so children use the correct
-//     // x/y value from the anchor
-//     if (anchorX || anchorY) {
-//       context.translate(-anchorX, -anchorY);
-//     }
-//     // @endif
+    // @ifdef GAMEOBJECT_ANCHOR
+    // 7) translate back to the anchor so children use the correct
+    // x/y value from the anchor
+    if (anchorX || anchorY) {
+      context.translate(-anchorX, -anchorY);
+    }
+    // @endif
 
-//     // @ifdef GAMEOBJECT_GROUP
-//     // perform all transforms on the parent before rendering the
-//     // children
-//     let children = this.children;
-//     children.map(child => child.render && child.render());
-//     // @endif
+    // @ifdef GAMEOBJECT_GROUP
+    // perform all transforms on the parent before rendering the
+    // children
+    let children = this.children;
+    children.map(child => child.render && child.render());
+    // @endif
 
-//     context.restore();
-//   }
+    context.restore();
+  }
 
-//   /**
-//    * Draw the game object at its X and Y position, taking into account rotation, scale, and anchor.
-//    *
-//    * Do note that the canvas has been rotated and translated to the objects position (taking into account anchor), so {0,0} will be the top-left corner of the game object when drawing.
-//    *
-//    * If you override the game objects `render()` function with your own render function, you can call this function to draw the game object normally.
-//    *
-//    * ```js
-//    * let { GameObject } = kontra;
-//    *
-//    * let gameObject = GameObject({
-//    *  x: 290,
-//    *  y: 80,
-//    *  width: 20,
-//    *  height: 40,
-//    *
-//    *  render: function() {
-//    *    // draw the game object normally (perform rotation and other transforms)
-//    *    this.draw();
-//    *
-//    *    // outline the game object
-//    *    this.context.strokeStyle = 'yellow';
-//    *    this.context.lineWidth = 2;
-//    *    this.context.strokeRect(0, 0, this.width, this.height);
-//    *  }
-//    * });
-//    *
-//    * gameObject.render();
-//    * ```
-//    * @memberof GameObject
-//    * @function draw
-//    */
-//   draw() {}
+  //   /**
+  //    * Draw the game object at its X and Y position, taking into account rotation, scale, and anchor.
+  //    *
+  //    * Do note that the canvas has been rotated and translated to the objects position (taking into account anchor), so {0,0} will be the top-left corner of the game object when drawing.
+  //    *
+  //    * If you override the game objects `render()` function with your own render function, you can call this function to draw the game object normally.
+  //    *
+  //    * ```js
+  //    * let { GameObject } = kontra;
+  //    *
+  //    * let gameObject = GameObject({
+  //    *  x: 290,
+  //    *  y: 80,
+  //    *  width: 20,
+  //    *  height: 40,
+  //    *
+  //    *  render: function() {
+  //    *    // draw the game object normally (perform rotation and other transforms)
+  //    *    this.draw();
+  //    *
+  //    *    // outline the game object
+  //    *    this.context.strokeStyle = 'yellow';
+  //    *    this.context.lineWidth = 2;
+  //    *    this.context.strokeRect(0, 0, this.width, this.height);
+  //    *  }
+  //    * });
+  //    *
+  //    * gameObject.render();
+  //    * ```
+  //    * @memberof GameObject
+  //    * @function draw
+  //    */
+  public virtual void draw() { }
 
-//   /**
-//    * Sync property changes from the parent to the child
-//    */
-//   _pc() {
-//     this._uw();
+  //   /**
+  //    * Sync property changes from the parent to the child
+  //    */
+  //   _pc() {
+  //     this._uw();
 
-//     // @ifdef GAMEOBJECT_GROUP
-//     this.children.map(child => child._pc());
-//     // @endif
-//   }
+  //     // @ifdef GAMEOBJECT_GROUP
+  //     this.children.map(child => child._pc());
+  //     // @endif
+  //   }
 
-//   /**
-//    * X coordinate of the position vector.
-//    * @memberof GameObject
-//    * @property {Number} x
-//    */
-//   get x() {
-//     return this.position.x;
-//   }
+  /**
+   * X coordinate of the position vector.
+   * @memberof GameObject
+   * @property {Number} x
+   */
+  public double X {
+    get => this.Position.X;
+    set {
+      this.Position.X = value;
 
-//   /**
-//    * Y coordinate of the position vector.
-//    * @memberof GameObject
-//    * @property {Number} y
-//    */
-//   get y() {
-//     return this.position.y;
-//   }
+      // pc = property changed
+      this._pc();
+    }
+  }
 
-//   set x(value) {
-//     this.position.x = value;
+  /**
+   * Y coordinate of the position vector.
+   * @memberof GameObject
+   * @property {Number} y
+   */
+  public double Y {
+    get => this.Position.Y;
+    set {
+      this.Position.Y = value;
+      this._pc();
+    }
+  }
 
-//     // pc = property changed
-//     this._pc();
-//   }
+public double width {
+  // w = width
+  get => this._w;
+  set {
+    this._w = value;
+    this._pc();
+  }
+}
 
-//   set y(value) {
-//     this.position.y = value;
-//     this._pc();
-//   }
+  //   get height() {
+  //     // h = height
+  //     return this._h;
+  //   }
 
-//   get width() {
-//     // w = width
-//     return this._w;
-//   }
+  //   set height(value) {
+  //     this._h = value;
+  //     this._pc();
+  //   }
 
-//   set width(value) {
-//     this._w = value;
-//     this._pc();
-//   }
+  //   /**
+  //    * Update world properties
+  //    */
+  //   _uw() {
+  //     // don't update world properties until after the init has finished
+  //     if (!this._di) return;
 
-//   get height() {
-//     // h = height
-//     return this._h;
-//   }
+  //     // @ifdef GAMEOBJECT_GROUP||GAMEOBJECT_OPACITY||GAMEOBJECT_ROTATION||GAMEOBJECT_SCALE
+  //     let {
+  //       _wx = 0,
+  //       _wy = 0,
 
-//   set height(value) {
-//     this._h = value;
-//     this._pc();
-//   }
+  //       // @ifdef GAMEOBJECT_OPACITY
+  //       _wo = 1,
+  //       // @endif
 
-//   /**
-//    * Update world properties
-//    */
-//   _uw() {
-//     // don't update world properties until after the init has finished
-//     if (!this._di) return;
+  //       // @ifdef GAMEOBJECT_ROTATION
+  //       _wr = 0,
+  //       // @endif
 
-//     // @ifdef GAMEOBJECT_GROUP||GAMEOBJECT_OPACITY||GAMEOBJECT_ROTATION||GAMEOBJECT_SCALE
-//     let {
-//       _wx = 0,
-//       _wy = 0,
+  //       // @ifdef GAMEOBJECT_SCALE
+  //       _wsx = 1,
+  //       _wsy = 1
+  //       // @endif
+  //     } = this.parent || {};
+  //     // @endif
 
-//       // @ifdef GAMEOBJECT_OPACITY
-//       _wo = 1,
-//       // @endif
+  //     // wx = world x, wy = world y
+  //     this._wx = this.x;
+  //     this._wy = this.y;
 
-//       // @ifdef GAMEOBJECT_ROTATION
-//       _wr = 0,
-//       // @endif
+  //     // ww = world width, wh = world height
+  //     this._ww = this.width;
+  //     this._wh = this.height;
 
-//       // @ifdef GAMEOBJECT_SCALE
-//       _wsx = 1,
-//       _wsy = 1
-//       // @endif
-//     } = this.parent || {};
-//     // @endif
+  //     // @ifdef GAMEOBJECT_OPACITY
+  //     // wo = world opacity
+  //     this._wo = _wo * this.opacity;
+  //     // @endif
 
-//     // wx = world x, wy = world y
-//     this._wx = this.x;
-//     this._wy = this.y;
+  //     // @ifdef GAMEOBJECT_SCALE
+  //     // wsx = world scale x, wsy = world scale y
+  //     this._wsx = _wsx * this.scaleX;
+  //     this._wsy = _wsy * this.scaleY;
 
-//     // ww = world width, wh = world height
-//     this._ww = this.width;
-//     this._wh = this.height;
+  //     this._wx = this._wx * _wsx;
+  //     this._wy = this._wy * _wsy;
+  //     this._ww = this.width * this._wsx;
+  //     this._wh = this.height * this._wsy;
+  //     // @endif
 
-//     // @ifdef GAMEOBJECT_OPACITY
-//     // wo = world opacity
-//     this._wo = _wo * this.opacity;
-//     // @endif
+  //     // @ifdef GAMEOBJECT_ROTATION
+  //     // wr = world rotation
+  //     this._wr = _wr + this.rotation;
 
-//     // @ifdef GAMEOBJECT_SCALE
-//     // wsx = world scale x, wsy = world scale y
-//     this._wsx = _wsx * this.scaleX;
-//     this._wsy = _wsy * this.scaleY;
+  //     let { x, y } = rotatePoint({ x: this._wx, y: this._wy }, _wr);
+  //     this._wx = x;
+  //     this._wy = y;
+  //     // @endif
 
-//     this._wx = this._wx * _wsx;
-//     this._wy = this._wy * _wsy;
-//     this._ww = this.width * this._wsx;
-//     this._wh = this.height * this._wsy;
-//     // @endif
+  //     // @ifdef GAMEOBJECT_GROUP
+  //     this._wx += _wx;
+  //     this._wy += _wy;
+  //     // @endif
+  //   }
 
-//     // @ifdef GAMEOBJECT_ROTATION
-//     // wr = world rotation
-//     this._wr = _wr + this.rotation;
+  //   /**
+  //    * The world position, width, height, opacity, rotation, and scale. The world property is the true position, width, height, etc. of the object, taking into account all parents.
+  //    *
+  //    * The world property does not adjust for anchor or scale, so if you set a negative scale the world width or height could be negative. Use [getWorldRect](/api/helpers#getWorldRect) to get the world position and size adjusted for anchor and scale.
+  //    * @property {{x: Number, y: Number, width: Number, height: Number, opacity: Number, rotation: Number, scaleX: Number, scaleY: Number}} world
+  //    * @memberof GameObject
+  //    */
+  //   get world() {
+  //     return {
+  //       x: this._wx,
+  //       y: this._wy,
+  //       width: this._ww,
+  //       height: this._wh,
 
-//     let { x, y } = rotatePoint({ x: this._wx, y: this._wy }, _wr);
-//     this._wx = x;
-//     this._wy = y;
-//     // @endif
+  //       // @ifdef GAMEOBJECT_OPACITY
+  //       opacity: this._wo,
+  //       // @endif
 
-//     // @ifdef GAMEOBJECT_GROUP
-//     this._wx += _wx;
-//     this._wy += _wy;
-//     // @endif
-//   }
+  //       // @ifdef GAMEOBJECT_ROTATION
+  //       rotation: this._wr,
+  //       // @endif
 
-//   /**
-//    * The world position, width, height, opacity, rotation, and scale. The world property is the true position, width, height, etc. of the object, taking into account all parents.
-//    *
-//    * The world property does not adjust for anchor or scale, so if you set a negative scale the world width or height could be negative. Use [getWorldRect](/api/helpers#getWorldRect) to get the world position and size adjusted for anchor and scale.
-//    * @property {{x: Number, y: Number, width: Number, height: Number, opacity: Number, rotation: Number, scaleX: Number, scaleY: Number}} world
-//    * @memberof GameObject
-//    */
-//   get world() {
-//     return {
-//       x: this._wx,
-//       y: this._wy,
-//       width: this._ww,
-//       height: this._wh,
+  //       // @ifdef GAMEOBJECT_SCALE
+  //       scaleX: this._wsx,
+  //       scaleY: this._wsy
+  //       // @endif
+  //     };
+  //   }
 
-//       // @ifdef GAMEOBJECT_OPACITY
-//       opacity: this._wo,
-//       // @endif
+  //   // --------------------------------------------------
+  //   // group
+  //   // --------------------------------------------------
 
-//       // @ifdef GAMEOBJECT_ROTATION
-//       rotation: this._wr,
-//       // @endif
+  //   // @ifdef GAMEOBJECT_GROUP
+  //   set children(value) {
+  //     this.removeChild(this._c);
+  //     this.addChild(value);
+  //   }
 
-//       // @ifdef GAMEOBJECT_SCALE
-//       scaleX: this._wsx,
-//       scaleY: this._wsy
-//       // @endif
-//     };
-//   }
+  //   get children() {
+  //     return this._c;
+  //   }
 
-//   // --------------------------------------------------
-//   // group
-//   // --------------------------------------------------
+  //   /**
+  //    * Add an object as a child to this object. The objects position, size, and rotation will be relative to the parents position, size, and rotation. The childs [world](api/gameObject#world) property will be updated to take into account this object and all of its parents.
+  //    * @memberof GameObject
+  //    * @function addChild
+  //    *
+  //    * @param {...(GameObject|GameObject[])[]} objects - Object to add as a child. Can be a single object, an array of objects, or a comma-separated list of objects.
+  //    *
+  //    * @example
+  //    * // exclude-code:start
+  //    * let { GameObject } = kontra;
+  //    * // exclude-code:end
+  //    * // exclude-script:start
+  //    * import { GameObject } from 'kontra';
+  //    * // exclude-script:end
+  //    *
+  //    * function createObject(x, y, color, size = 1) {
+  //    *   return GameObject({
+  //    *     x,
+  //    *     y,
+  //    *     width: 50 / size,
+  //    *     height: 50 / size,
+  //    *     anchor: {x: 0.5, y: 0.5},
+  //    *     color,
+  //    *     // exclude-code:start
+  //    *     context: context,
+  //    *     // exclude-code:end
+  //    *     render: function() {
+  //    *       this.context.fillStyle = this.color;
+  //    *       this.context.fillRect(0, 0, this.height, this.width);
+  //    *     }
+  //    *   });
+  //    * }
+  //    *
+  //    * let parent = createObject(300, 100, 'red');
+  //    *
+  //    * // create a child that is 25px to the right and
+  //    * // down from the parents position
+  //    * let child = createObject(25, 25, 'yellow', 2);
+  //    *
+  //    * parent.addChild(child);
+  //    *
+  //    * parent.render();
+  //    */
+  //   addChild(...objects) {
+  //     objects.flat().map(child => {
+  //       this.children.push(child);
+  //       child.parent = this;
+  //       child._pc = child._pc || noop;
+  //       child._pc();
+  //     });
+  //   }
 
-//   // @ifdef GAMEOBJECT_GROUP
-//   set children(value) {
-//     this.removeChild(this._c);
-//     this.addChild(value);
-//   }
+  //   /**
+  //    * Remove an object as a child of this object. The removed objects [world](api/gameObject#world) property will be updated to not take into account this object and all of its parents.
+  //    * @memberof GameObject
+  //    * @function removeChild
+  //    *
+  //    * @param {...(GameObject|GameObject[])[]} objects - Object to remove as a child. Can be a single object, an array of objects, or a comma-separated list of objects.
+  //    */
+  //   removeChild(...objects) {
+  //     objects.flat().map(child => {
+  //       if (removeFromArray(this.children, child)) {
+  //         child.parent = null;
+  //         child._pc();
+  //       }
+  //     });
+  //   }
+  //   // @endif
 
-//   get children() {
-//     return this._c;
-//   }
+  //   // --------------------------------------------------
+  //   // opacity
+  //   // --------------------------------------------------
 
-//   /**
-//    * Add an object as a child to this object. The objects position, size, and rotation will be relative to the parents position, size, and rotation. The childs [world](api/gameObject#world) property will be updated to take into account this object and all of its parents.
-//    * @memberof GameObject
-//    * @function addChild
-//    *
-//    * @param {...(GameObject|GameObject[])[]} objects - Object to add as a child. Can be a single object, an array of objects, or a comma-separated list of objects.
-//    *
-//    * @example
-//    * // exclude-code:start
-//    * let { GameObject } = kontra;
-//    * // exclude-code:end
-//    * // exclude-script:start
-//    * import { GameObject } from 'kontra';
-//    * // exclude-script:end
-//    *
-//    * function createObject(x, y, color, size = 1) {
-//    *   return GameObject({
-//    *     x,
-//    *     y,
-//    *     width: 50 / size,
-//    *     height: 50 / size,
-//    *     anchor: {x: 0.5, y: 0.5},
-//    *     color,
-//    *     // exclude-code:start
-//    *     context: context,
-//    *     // exclude-code:end
-//    *     render: function() {
-//    *       this.context.fillStyle = this.color;
-//    *       this.context.fillRect(0, 0, this.height, this.width);
-//    *     }
-//    *   });
-//    * }
-//    *
-//    * let parent = createObject(300, 100, 'red');
-//    *
-//    * // create a child that is 25px to the right and
-//    * // down from the parents position
-//    * let child = createObject(25, 25, 'yellow', 2);
-//    *
-//    * parent.addChild(child);
-//    *
-//    * parent.render();
-//    */
-//   addChild(...objects) {
-//     objects.flat().map(child => {
-//       this.children.push(child);
-//       child.parent = this;
-//       child._pc = child._pc || noop;
-//       child._pc();
-//     });
-//   }
+  //   // @ifdef GAMEOBJECT_OPACITY
+  //   get opacity() {
+  //     return this._opa;
+  //   }
 
-//   /**
-//    * Remove an object as a child of this object. The removed objects [world](api/gameObject#world) property will be updated to not take into account this object and all of its parents.
-//    * @memberof GameObject
-//    * @function removeChild
-//    *
-//    * @param {...(GameObject|GameObject[])[]} objects - Object to remove as a child. Can be a single object, an array of objects, or a comma-separated list of objects.
-//    */
-//   removeChild(...objects) {
-//     objects.flat().map(child => {
-//       if (removeFromArray(this.children, child)) {
-//         child.parent = null;
-//         child._pc();
-//       }
-//     });
-//   }
-//   // @endif
+  //   set opacity(value) {
+  //     this._opa = clamp(0, 1, value);
+  //     this._pc();
+  //   }
+  //   // @endif
 
-//   // --------------------------------------------------
-//   // opacity
-//   // --------------------------------------------------
+  //   // --------------------------------------------------
+  //   // rotation
+  //   // --------------------------------------------------
 
-//   // @ifdef GAMEOBJECT_OPACITY
-//   get opacity() {
-//     return this._opa;
-//   }
+  //   // @ifdef GAMEOBJECT_ROTATION
+  //   get rotation() {
+  //     return this._rot;
+  //   }
 
-//   set opacity(value) {
-//     this._opa = clamp(0, 1, value);
-//     this._pc();
-//   }
-//   // @endif
+  //   set rotation(value) {
+  //     this._rot = value;
+  //     this._pc();
+  //   }
+  //   // @endif
 
-//   // --------------------------------------------------
-//   // rotation
-//   // --------------------------------------------------
+  //   // --------------------------------------------------
+  //   // scale
+  //   // --------------------------------------------------
 
-//   // @ifdef GAMEOBJECT_ROTATION
-//   get rotation() {
-//     return this._rot;
-//   }
+  //   // @ifdef GAMEOBJECT_SCALE
+  //   /**
+  //    * Set the x and y scale of the object. If only one value is passed, both are set to the same value.
+  //    * @memberof GameObject
+  //    * @function setScale
+  //    *
+  //    * @param {Number} x - X scale value.
+  //    * @param {Number} [y=x] - Y scale value.
+  //    */
+  //   setScale(x, y = x) {
+  //     this.scaleX = x;
+  //     this.scaleY = y;
+  //   }
 
-//   set rotation(value) {
-//     this._rot = value;
-//     this._pc();
-//   }
-//   // @endif
+  //   get scaleX() {
+  //     return this._scx;
+  //   }
 
-//   // --------------------------------------------------
-//   // scale
-//   // --------------------------------------------------
+  //   set scaleX(value) {
+  //     this._scx = value;
+  //     this._pc();
+  //   }
 
-//   // @ifdef GAMEOBJECT_SCALE
-//   /**
-//    * Set the x and y scale of the object. If only one value is passed, both are set to the same value.
-//    * @memberof GameObject
-//    * @function setScale
-//    *
-//    * @param {Number} x - X scale value.
-//    * @param {Number} [y=x] - Y scale value.
-//    */
-//   setScale(x, y = x) {
-//     this.scaleX = x;
-//     this.scaleY = y;
-//   }
+  //   get scaleY() {
+  //     return this._scy;
+  //   }
 
-//   get scaleX() {
-//     return this._scx;
-//   }
-
-//   set scaleX(value) {
-//     this._scx = value;
-//     this._pc();
-//   }
-
-//   get scaleY() {
-//     return this._scy;
-//   }
-
-//   set scaleY(value) {
-//     this._scy = value;
-//     this._pc();
-//   }
-//   // @endif
+  //   set scaleY(value) {
+  //     this._scy = value;
+  //     this._pc();
+  //   }
+  //   // @endif
 }
 
 // export default function factory() {
@@ -673,23 +670,24 @@ public abstract partial class GameObject : Updatable {
 // }
 // export { GameObject as GameObjectClass };
 
-public abstract partial class GameObject
-{
+public abstract partial class GameObject {
   private object[] _c;
-  private double Width {get;init;}
-  private double Height {get;init;}
-  private Point Anchor {get;init;}
-  private double Opacity {get;init;}
-  private double Rotation {get;init;}
-  private double ScaleX {get;init;}
-  private double ScaleY {get;init;}
+  private double Width { get; init; }
+  private double Height { get; init; }
+  private Context context { get; init; }
+  private Point Anchor { get; init; }
+  private double Opacity { get; init; }
+  private double Rotation { get; init; }
+  private double ScaleX { get; init; }
+  private double ScaleY { get; init; }
 
 
-// private readonly bool _di;
+  // private readonly bool _di;
+  private List<GameObject> children { get; init; } = [];
 
-public abstract void _uw();
-public abstract void addChild(GameObject[] children );
+  public abstract void _uw();
+  public abstract void addChild(IEnumerable<GameObject> children);
 
-public readonly Action _rf;
-public readonly Action _uf;
+  public readonly Action _rf;
+  public readonly Action<double> _uf;
 }

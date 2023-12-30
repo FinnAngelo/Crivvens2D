@@ -248,7 +248,7 @@ public abstract partial class GameObject : Updatable {
     this._uf(dt);
 
     // @ifdef GAMEOBJECT_GROUP
-    this.children.ForEach(child => child?.update(dt));
+    this.Children.ForEach(child => child?.update(dt));
     // @endif
   }
 
@@ -295,8 +295,8 @@ public abstract partial class GameObject : Updatable {
     // @ifdef GAMEOBJECT_ANCHOR
     // 5) translate to the anchor so (0,0) is the top left corner
     // for the render function
-    var anchorX = -this.width * this.Anchor.X;
-    var anchorY = -this.height * this.Anchor.Y;
+    var anchorX = -this.Width * this.Anchor.X;
+    var anchorY = -this.Height * this.Anchor.Y;
 
     if (anchorX !=0|| anchorY != 0) {
       context.Translate(anchorX, anchorY);
@@ -322,7 +322,7 @@ public abstract partial class GameObject : Updatable {
     // @ifdef GAMEOBJECT_GROUP
     // perform all transforms on the parent before rendering the
     // children
-    var children = this.children;
+    var children = this.Children;
     children.ForEach(child => child?.render());
     // @endif
 
@@ -366,11 +366,11 @@ public abstract partial class GameObject : Updatable {
     /**
      * Sync property changes from the parent to the child
      */
-  public void _pc() {
+  public override void _pc() {
       this._uw();
 
       // @ifdef GAMEOBJECT_GROUP
-      this.children.ForEach(child => child._pc());
+      this.Children.ForEach(child => child._pc());
       // @endif
     }
 
@@ -423,7 +423,7 @@ public double Height {
     /**
      * Update world properties
      */
-    public override void _uw() {
+    public void _uw() {
       // don't update world properties until after the init has finished
       if (!this._di) return;
 
@@ -447,22 +447,22 @@ public double Height {
       // @endif
 
       // wx = world x, wy = world y
-      this._wx = this.x;
-      this._wy = this.y;
+      this._wx = this.X;
+      this._wy = this.Y;
 
       // ww = world width, wh = world height
-      this._ww = this.width;
-      this._wh = this.height;
+      this._ww = this.Width;
+      this._wh = this.Height;
 
       // @ifdef GAMEOBJECT_OPACITY
       // wo = world opacity
-      this._wo = _wo * this.opacity;
+      this._wo = _wo * this.Opacity;
       // @endif
 
       // @ifdef GAMEOBJECT_SCALE
       // wsx = world scale x, wsy = world scale y
-      this._wsx = _wsx * this.scaleX;
-      this._wsy = _wsy * this.scaleY;
+      this._wsx = _wsx * this.ScaleX;
+      this._wsy = _wsy * this.ScaleY;
 
       this._wx = this._wx * _wsx;
       this._wy = this._wy * _wsy;
@@ -472,9 +472,9 @@ public double Height {
 
       // @ifdef GAMEOBJECT_ROTATION
       // wr = world rotation
-      this._wr = _wr + this.rotation;
+      this._wr = _wr + this.Rotation;
 
-      let { x, y } = rotatePoint({ x: this._wx, y: this._wy }, _wr);
+      var ( double x, double y ) = RotatePoint(new Point(X: this._wx, Y: this._wy ), _wr);
       this._wx = x;
       this._wy = y;
       // @endif
@@ -514,19 +514,18 @@ public double Height {
   //     };
   //   }
 
-  //   // --------------------------------------------------
-  //   // group
-  //   // --------------------------------------------------
+    // --------------------------------------------------
+    // group
+    // --------------------------------------------------
 
-  //   // @ifdef GAMEOBJECT_GROUP
-  //   set children(value) {
-  //     this.removeChild(this._c);
-  //     this.addChild(value);
-  //   }
-
-  //   get children() {
-  //     return this._c;
-  //   }
+    // @ifdef GAMEOBJECT_GROUP
+    public List<GameObject> Children {
+      set => {
+      this.removeChild(this._c);
+      this.addChild(value);
+    }
+    get => this._c;
+    }
 
   //   /**
   //    * Add an object as a child to this object. The objects position, size, and rotation will be relative to the parents position, size, and rotation. The childs [world](api/gameObject#world) property will be updated to take into account this object and all of its parents.
@@ -597,35 +596,33 @@ public double Height {
   //   }
   //   // @endif
 
-  //   // --------------------------------------------------
-  //   // opacity
-  //   // --------------------------------------------------
+    // --------------------------------------------------
+    // opacity
+    // --------------------------------------------------
 
-  //   // @ifdef GAMEOBJECT_OPACITY
-  //   get opacity() {
-  //     return this._opa;
-  //   }
+    // @ifdef GAMEOBJECT_OPACITY
+    public double Opacity {
+      get => this._opa;
+      set =>  {
+      this._opa = clamp(0, 1, value);
+      this._pc();
+      }
+    }
+    // @endif
 
-  //   set opacity(value) {
-  //     this._opa = clamp(0, 1, value);
-  //     this._pc();
-  //   }
-  //   // @endif
+    // --------------------------------------------------
+    // rotation
+    // --------------------------------------------------
 
-  //   // --------------------------------------------------
-  //   // rotation
-  //   // --------------------------------------------------
-
-  //   // @ifdef GAMEOBJECT_ROTATION
-  //   get rotation() {
-  //     return this._rot;
-  //   }
-
-  //   set rotation(value) {
-  //     this._rot = value;
-  //     this._pc();
-  //   }
-  //   // @endif
+    // @ifdef GAMEOBJECT_ROTATION
+    public double Rotation {
+      get => this._rot;
+    set => {
+      this._rot = value;
+      this._pc();
+    }
+    }
+    // @endif
 
     // --------------------------------------------------
     // scale
@@ -673,19 +670,13 @@ public double Height {
 
 public abstract partial class GameObject {
   private object[] _c;
-  private double Width { get; init; }
-  private double Height { get; init; }
   private Context Context { get; init; }
   private Point Anchor { get; init; }
-  private double Opacity { get; init; }
-  private double Rotation { get; init; }
-  private double ScaleX { get; init; }
-  private double ScaleY { get; init; }
 
 
   private readonly bool _di;
-  private List<GameObject> children { get; init; } = [];
 
+private double _opa;
   public abstract void addChild(IEnumerable<GameObject> children);
 
   public readonly Action _rf;

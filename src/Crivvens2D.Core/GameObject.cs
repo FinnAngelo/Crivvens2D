@@ -4,6 +4,8 @@
 // import { rotatePoint, clamp } from './helpers.js';
 // import { noop, removeFromArray } from './utils.js';
 using static Crivvens2D.Core.Events;
+using static Crivvens2D.Core.Helpers;
+
 namespace Crivvens2D.Core;
 
 // /**
@@ -189,7 +191,7 @@ public abstract partial class GameObject : Updatable {
     if(context == null) throw new ArgumentException(nameof(context));
     ArgumentNullException.ThrowIfNull(context, nameof(context));
     // @ifdef GAMEOBJECT_GROUP
-    this._c = [];
+    this._c = new List<GameObject>();
     // @endif
 
     // by setting defaults to the parameters and passing them into
@@ -466,15 +468,15 @@ public double Height {
 
       this._wx = this._wx * _wsx;
       this._wy = this._wy * _wsy;
-      this._ww = this.width * this._wsx;
-      this._wh = this.height * this._wsy;
+      this._ww = this.Width * this._wsx;
+      this._wh = this.Height * this._wsy;
       // @endif
 
       // @ifdef GAMEOBJECT_ROTATION
       // wr = world rotation
       this._wr = _wr + this.Rotation;
 
-      var ( double x, double y ) = RotatePoint(new Point(X: this._wx, Y: this._wy ), _wr);
+      ( double x, double y ) = RotatePoint(new Point(X: this._wx, Y: this._wy ), _wr);
       this._wx = x;
       this._wy = y;
       // @endif
@@ -520,81 +522,81 @@ public double Height {
 
     // @ifdef GAMEOBJECT_GROUP
     public List<GameObject> Children {
-      set => {
+      set {
       this.removeChild(this._c);
       this.addChild(value);
     }
     get => this._c;
     }
 
-  //   /**
-  //    * Add an object as a child to this object. The objects position, size, and rotation will be relative to the parents position, size, and rotation. The childs [world](api/gameObject#world) property will be updated to take into account this object and all of its parents.
-  //    * @memberof GameObject
-  //    * @function addChild
-  //    *
-  //    * @param {...(GameObject|GameObject[])[]} objects - Object to add as a child. Can be a single object, an array of objects, or a comma-separated list of objects.
-  //    *
-  //    * @example
-  //    * // exclude-code:start
-  //    * let { GameObject } = kontra;
-  //    * // exclude-code:end
-  //    * // exclude-script:start
-  //    * import { GameObject } from 'kontra';
-  //    * // exclude-script:end
-  //    *
-  //    * function createObject(x, y, color, size = 1) {
-  //    *   return GameObject({
-  //    *     x,
-  //    *     y,
-  //    *     width: 50 / size,
-  //    *     height: 50 / size,
-  //    *     anchor: {x: 0.5, y: 0.5},
-  //    *     color,
-  //    *     // exclude-code:start
-  //    *     context: context,
-  //    *     // exclude-code:end
-  //    *     render: function() {
-  //    *       this.context.fillStyle = this.color;
-  //    *       this.context.fillRect(0, 0, this.height, this.width);
-  //    *     }
-  //    *   });
-  //    * }
-  //    *
-  //    * let parent = createObject(300, 100, 'red');
-  //    *
-  //    * // create a child that is 25px to the right and
-  //    * // down from the parents position
-  //    * let child = createObject(25, 25, 'yellow', 2);
-  //    *
-  //    * parent.addChild(child);
-  //    *
-  //    * parent.render();
-  //    */
-  //   addChild(...objects) {
-  //     objects.flat().map(child => {
-  //       this.children.push(child);
-  //       child.parent = this;
-  //       child._pc = child._pc || noop;
-  //       child._pc();
-  //     });
-  //   }
+    /**
+     * Add an object as a child to this object. The objects position, size, and rotation will be relative to the parents position, size, and rotation. The childs [world](api/gameObject#world) property will be updated to take into account this object and all of its parents.
+     * @memberof GameObject
+     * @function addChild
+     *
+     * @param {...(GameObject|GameObject[])[]} objects - Object to add as a child. Can be a single object, an array of objects, or a comma-separated list of objects.
+     *
+     * @example
+     * // exclude-code:start
+     * let { GameObject } = kontra;
+     * // exclude-code:end
+     * // exclude-script:start
+     * import { GameObject } from 'kontra';
+     * // exclude-script:end
+     *
+     * function createObject(x, y, color, size = 1) {
+     *   return GameObject({
+     *     x,
+     *     y,
+     *     width: 50 / size,
+     *     height: 50 / size,
+     *     anchor: {x: 0.5, y: 0.5},
+     *     color,
+     *     // exclude-code:start
+     *     context: context,
+     *     // exclude-code:end
+     *     render: function() {
+     *       this.context.fillStyle = this.color;
+     *       this.context.fillRect(0, 0, this.height, this.width);
+     *     }
+     *   });
+     * }
+     *
+     * let parent = createObject(300, 100, 'red');
+     *
+     * // create a child that is 25px to the right and
+     * // down from the parents position
+     * let child = createObject(25, 25, 'yellow', 2);
+     *
+     * parent.addChild(child);
+     *
+     * parent.render();
+     */
+     public void addChild(List<GameObject> objects)
+      objects.ForEach(child => {
+        this.children.Add(child);
+        child.parent = this;
+        child._pc = child._pc ?? noop;
+        child._pc();
+      });
+    }
 
-  //   /**
-  //    * Remove an object as a child of this object. The removed objects [world](api/gameObject#world) property will be updated to not take into account this object and all of its parents.
-  //    * @memberof GameObject
-  //    * @function removeChild
-  //    *
-  //    * @param {...(GameObject|GameObject[])[]} objects - Object to remove as a child. Can be a single object, an array of objects, or a comma-separated list of objects.
-  //    */
-  //   removeChild(...objects) {
-  //     objects.flat().map(child => {
-  //       if (removeFromArray(this.children, child)) {
-  //         child.parent = null;
-  //         child._pc();
-  //       }
-  //     });
-  //   }
-  //   // @endif
+    /**
+     * Remove an object as a child of this object. The removed objects [world](api/gameObject#world) property will be updated to not take into account this object and all of its parents.
+     * @memberof GameObject
+     * @function removeChild
+     *
+     * @param {...(GameObject|GameObject[])[]} objects - Object to remove as a child. Can be a single object, an array of objects, or a comma-separated list of objects.
+     */
+    removeChild(...objects) {
+      objects.flat().map(child => {
+        if (removeFromArray(this.children, child)) {
+          child.parent = null;
+          child._pc();
+        }
+      });
+    }
+    // @endif
 
     // --------------------------------------------------
     // opacity
@@ -603,8 +605,8 @@ public double Height {
     // @ifdef GAMEOBJECT_OPACITY
     public double Opacity {
       get => this._opa;
-      set =>  {
-      this._opa = clamp(0, 1, value);
+      set {
+      this._opa = Clamp(0, 1, value);
       this._pc();
       }
     }
@@ -617,7 +619,7 @@ public double Height {
     // @ifdef GAMEOBJECT_ROTATION
     public double Rotation {
       get => this._rot;
-    set => {
+    set {
       this._rot = value;
       this._pc();
     }
@@ -640,13 +642,13 @@ public double Height {
     public void setScale(double scale)
       => setScale(x: scale, y:scale);
     public void setScale(double x, double y) {
-      this.scaleX = x;
-      this.scaleY = y;
+      this.ScaleX = x;
+      this.ScaleY = y;
     }
 
     public double ScaleX {
       get => this._scx;
-      set => {
+      set {
         this._scx = value;
         this._pc();
       }
@@ -654,7 +656,7 @@ public double Height {
 
     public double ScaleY {
       get => this._scy;
-      set => {
+      set {
         this._scy = value;
         this._pc();
       }
@@ -669,15 +671,29 @@ public double Height {
 // export { GameObject as GameObjectClass };
 
 public abstract partial class GameObject {
-  private object[] _c;
+  private  List<GameObject> _c;
   private Context Context { get; init; }
   private Point Anchor { get; init; }
 
 
   private readonly bool _di;
 
+private double _w;
+private double _h;
+private double _wx;
+private double _wy;
+private double _ww;
+private double _wh;
+private double _wo;
+private double _wr;
+private double _wsx;
+private double _wsy;
 private double _opa;
-  public abstract void addChild(IEnumerable<GameObject> children);
+private double _rot;
+private double _scx;
+private double _scy;
+
+  
 
   public readonly Action _rf;
   public readonly Action<double> _uf;

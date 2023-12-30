@@ -487,34 +487,34 @@ public double Height {
       // @endif
     }
 
-  //   /**
-  //    * The world position, width, height, opacity, rotation, and scale. The world property is the true position, width, height, etc. of the object, taking into account all parents.
-  //    *
-  //    * The world property does not adjust for anchor or scale, so if you set a negative scale the world width or height could be negative. Use [getWorldRect](/api/helpers#getWorldRect) to get the world position and size adjusted for anchor and scale.
-  //    * @property {{x: Number, y: Number, width: Number, height: Number, opacity: Number, rotation: Number, scaleX: Number, scaleY: Number}} world
-  //    * @memberof GameObject
-  //    */
-  //   get world() {
-  //     return {
-  //       x: this._wx,
-  //       y: this._wy,
-  //       width: this._ww,
-  //       height: this._wh,
+    /**
+     * The world position, width, height, opacity, rotation, and scale. The world property is the true position, width, height, etc. of the object, taking into account all parents.
+     *
+     * The world property does not adjust for anchor or scale, so if you set a negative scale the world width or height could be negative. Use [getWorldRect](/api/helpers#getWorldRect) to get the world position and size adjusted for anchor and scale.
+     * @property {{x: Number, y: Number, width: Number, height: Number, opacity: Number, rotation: Number, scaleX: Number, scaleY: Number}} world
+     * @memberof GameObject
+     */
+    get world() {
+      return (
+        x: this._wx,
+        y: this._wy,
+        width: this._ww,
+        height: this._wh,
 
-  //       // @ifdef GAMEOBJECT_OPACITY
-  //       opacity: this._wo,
-  //       // @endif
+        // @ifdef GAMEOBJECT_OPACITY
+        opacity: this._wo,
+        // @endif
 
-  //       // @ifdef GAMEOBJECT_ROTATION
-  //       rotation: this._wr,
-  //       // @endif
+        // @ifdef GAMEOBJECT_ROTATION
+        rotation: this._wr,
+        // @endif
 
-  //       // @ifdef GAMEOBJECT_SCALE
-  //       scaleX: this._wsx,
-  //       scaleY: this._wsy
-  //       // @endif
-  //     };
-  //   }
+        // @ifdef GAMEOBJECT_SCALE
+        scaleX: this._wsx,
+        scaleY: this._wsy
+        // @endif
+      );
+    }
 
     // --------------------------------------------------
     // group

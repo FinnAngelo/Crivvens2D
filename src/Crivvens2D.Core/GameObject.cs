@@ -8,50 +8,50 @@ using static Crivvens2D.Core.Helpers;
 
 namespace Crivvens2D.Core;
 
-// /**
-//  * The base class of most renderable classes. Handles things such as position, rotation, anchor, and the update and render life cycle.
-//  *
-//  * Typically you don't create a GameObject directly, but rather extend it for new classes.
-//  * @class GameObject
-//  *
-//  * @param {Object} [properties] - Properties of the game object.
-//  * @param {Number} [properties.x] - X coordinate of the position vector.
-//  * @param {Number} [properties.y] - Y coordinate of the position vector.
-//  * @param {Number} [properties.width] - Width of the game object.
-//  * @param {Number} [properties.height] - Height of the game object.
-//  *
-//  * @param {CanvasRenderingContext2D} [properties.context] - The context the game object should draw to. Defaults to [core.getContext()](api/core#getContext).
-//  *
-//  * @param {Number} [properties.dx] - X coordinate of the velocity vector.
-//  * @param {Number} [properties.dy] - Y coordinate of the velocity vector.
-//  * @param {Number} [properties.ddx] - X coordinate of the acceleration vector.
-//  * @param {Number} [properties.ddy] - Y coordinate of the acceleration vector.
-//  * @param {Number} [properties.ttl=Infinity] - How many frames the game object should be alive. Used by [Pool](api/pool).
-//  *
-//  * @param {{x: Number, y: Number}} [properties.anchor={x:0,y:0}] - The x and y origin of the game object. {x:0, y:0} is the top left corner of the game object, {x:1, y:1} is the bottom right corner.
-//  * @param {GameObject[]} [properties.children] - Children to add to the game object.
-//  * @param {Number} [properties.opacity=1] - The opacity of the game object.
-//  * @param {Number} [properties.rotation=0] - The rotation around the anchor in radians.
-//  * @param {Number} [properties.scaleX=1] - The x scale of the game object.
-//  * @param {Number} [properties.scaleY=1] - The y scale of the game object.
-//  *
-//  * @param {(dt?: Number) => void} [properties.update] - Function called every frame to update the game object.
-//  * @param {Function} [properties.render] - Function called every frame to render the game object.
-//  *
-//  * @param {...*} properties.props - Any additional properties you need added to the game object. For example, if you pass `gameObject({type: 'player'})` then the game object will also have a property of the same name and value. You can pass as many additional properties as you want.
-//  */
+/**
+ * The base class of most renderable classes. Handles things such as position, rotation, anchor, and the update and render life cycle.
+ *
+ * Typically you don't create a GameObject directly, but rather extend it for new classes.
+ * @class GameObject
+ *
+ * @param {Object} [properties] - Properties of the game object.
+ * @param {Number} [properties.x] - X coordinate of the position vector.
+ * @param {Number} [properties.y] - Y coordinate of the position vector.
+ * @param {Number} [properties.width] - Width of the game object.
+ * @param {Number} [properties.height] - Height of the game object.
+ *
+ * @param {CanvasRenderingContext2D} [properties.context] - The context the game object should draw to. Defaults to [core.getContext()](api/core#getContext).
+ *
+ * @param {Number} [properties.dx] - X coordinate of the velocity vector.
+ * @param {Number} [properties.dy] - Y coordinate of the velocity vector.
+ * @param {Number} [properties.ddx] - X coordinate of the acceleration vector.
+ * @param {Number} [properties.ddy] - Y coordinate of the acceleration vector.
+ * @param {Number} [properties.ttl=Infinity] - How many frames the game object should be alive. Used by [Pool](api/pool).
+ *
+ * @param {{x: Number, y: Number}} [properties.anchor={x:0,y:0}] - The x and y origin of the game object. {x:0, y:0} is the top left corner of the game object, {x:1, y:1} is the bottom right corner.
+ * @param {GameObject[]} [properties.children] - Children to add to the game object.
+ * @param {Number} [properties.opacity=1] - The opacity of the game object.
+ * @param {Number} [properties.rotation=0] - The rotation around the anchor in radians.
+ * @param {Number} [properties.scaleX=1] - The x scale of the game object.
+ * @param {Number} [properties.scaleY=1] - The y scale of the game object.
+ *
+ * @param {(dt?: Number) => void} [properties.update] - Function called every frame to update the game object.
+ * @param {Function} [properties.render] - Function called every frame to render the game object.
+ *
+ * @param {...*} properties.props - Any additional properties you need added to the game object. For example, if you pass `gameObject({type: 'player'})` then the game object will also have a property of the same name and value. You can pass as many additional properties as you want.
+ */
 public abstract partial class GameObject : Updatable {
-  //   /**
-  //    * @docs docs/api_docs/gameObject.js
-  //    */
+    /**
+     * @docs docs/api_docs/gameObject.js
+     */
 
-  //   /**
-  //    * Use this function to reinitialize a game object. It takes the same properties object as the constructor. Useful it you want to repurpose a game object.
-  //    * @memberof GameObject
-  //    * @function init
-  //    *
-  //    * @param {Object} properties - Properties of the game object.
-  //    */
+    /**
+     * Use this function to reinitialize a game object. It takes the same properties object as the constructor. Useful it you want to repurpose a game object.
+     * @memberof GameObject
+     * @function init
+     *
+     * @param {Object} properties - Properties of the game object.
+     */
   public GameObject(
     // --------------------------------------------------
     // defaults

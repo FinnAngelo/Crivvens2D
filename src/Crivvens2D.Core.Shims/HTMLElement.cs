@@ -5,7 +5,7 @@
 public interface ICanvas {
 }
 
-public interface ICanvasRenderingContext2D {
+public partial interface ICanvasRenderingContext2D {
   void FillRect(double x, double y, double width, double height);
   void ClearRect(double x, double y, double width, double height);
   void StrokeRect(double x, double y, double width, double height);
@@ -24,9 +24,12 @@ public interface ICanvasRenderingContext2D {
   void Rotate(double angle);
   void Translate(double x, double y);
   void Transform(double a, double b, double c, double d, double e, double f);
-  void Save();
 }
-
+public partial interface ICanvasRenderingContext2D {
+  void Save();
+  void Restore();
+public double GlobalAlpha {set;}
+}
 public interface IPoint {
   double X { get; }
   double Y { get; }

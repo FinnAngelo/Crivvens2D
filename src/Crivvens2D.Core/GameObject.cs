@@ -186,6 +186,8 @@ public abstract partial class GameObject : Updatable {
 
   //...props
   ) {
+    if(context == null) throw new ArgumentException(nameof(context));
+    ArgumentNullException.ThrowIfNull(context, nameof(context));
     // @ifdef GAMEOBJECT_GROUP
     this._c = [];
     // @endif
@@ -198,7 +200,7 @@ public abstract partial class GameObject : Updatable {
     //super.init({
     Width = width;
     Height = height;
-    // context,
+    Context = context;
 
     // @ifdef GAMEOBJECT_ANCHOR
     Anchor = anchor;
@@ -221,7 +223,7 @@ public abstract partial class GameObject : Updatable {
     //});
 
     // di = done init
-    // this._di = true;
+    this._di = true;
     this._uw();
 
     // @ifdef GAMEOBJECT_GROUP
@@ -256,7 +258,7 @@ public abstract partial class GameObject : Updatable {
    * @function render
    */
   public void render() {
-    var context = this.context;
+    var context = this.Context;
     context.Save();
 
     // 1) translate to position
@@ -264,8 +266,8 @@ public abstract partial class GameObject : Updatable {
     // it's faster to only translate if one of the values is non-zero
     // rather than always translating
     // @see https://jsperf.com/translate-or-if-statement/2
-    if (this.X || this.y) {
-      context.translate(this.x, this.y);
+    if (this.X !=0 || this.Y !=0) {
+      context.Translate(this.X, this.Y);
     }
 
     // @ifdef GAMEOBJECT_ROTATION
@@ -273,8 +275,8 @@ public abstract partial class GameObject : Updatable {
     //
     // it's faster to only rotate when set rather than always rotating
     // @see https://jsperf.com/rotate-or-if-statement/2
-    if (this.rotation) {
-      context.rotate(this.rotation);
+    if (this.Rotation != 0) {
+      context.Rotate(this.Rotation);
     }
     // @endif
 
@@ -285,26 +287,26 @@ public abstract partial class GameObject : Updatable {
     // it's faster to only scale if one of the values is not 1
     // rather than always scaling
     // @see https://jsperf.com/scale-or-if-statement/4
-    if (this.scaleX != 1 || this.scaleY != 1) {
-      context.scale(this.scaleX, this.scaleY);
+    if (this.ScaleX != 1 || this.ScaleY != 1) {
+      context.Scale(this.ScaleX, this.ScaleY);
     }
     // @endif
 
     // @ifdef GAMEOBJECT_ANCHOR
     // 5) translate to the anchor so (0,0) is the top left corner
     // for the render function
-    let anchorX = -this.width * this.anchor.x;
-    let anchorY = -this.height * this.anchor.y;
+    var anchorX = -this.width * this.Anchor.X;
+    var anchorY = -this.height * this.Anchor.Y;
 
-    if (anchorX || anchorY) {
-      context.translate(anchorX, anchorY);
+    if (anchorX !=0|| anchorY != 0) {
+      context.Translate(anchorX, anchorY);
     }
     // @endif
 
     // @ifdef GAMEOBJECT_OPACITY
     // it's not really any faster to gate the global alpha
     // @see https://jsperf.com/global-alpha-or-if-statement/1
-    this.context.globalAlpha = this.opacity;
+    this.Context.GlobalAlpha = this.Opacity;
     // @endif
 
     this._rf();
@@ -312,65 +314,65 @@ public abstract partial class GameObject : Updatable {
     // @ifdef GAMEOBJECT_ANCHOR
     // 7) translate back to the anchor so children use the correct
     // x/y value from the anchor
-    if (anchorX || anchorY) {
-      context.translate(-anchorX, -anchorY);
+    if (anchorX != 0 || anchorY != 0) {
+      context.Translate(-anchorX, -anchorY);
     }
     // @endif
 
     // @ifdef GAMEOBJECT_GROUP
     // perform all transforms on the parent before rendering the
     // children
-    let children = this.children;
-    children.map(child => child.render && child.render());
+    var children = this.children;
+    children.ForEach(child => child?.render());
     // @endif
 
-    context.restore();
+    context.Restore();
   }
 
-  //   /**
-  //    * Draw the game object at its X and Y position, taking into account rotation, scale, and anchor.
-  //    *
-  //    * Do note that the canvas has been rotated and translated to the objects position (taking into account anchor), so {0,0} will be the top-left corner of the game object when drawing.
-  //    *
-  //    * If you override the game objects `render()` function with your own render function, you can call this function to draw the game object normally.
-  //    *
-  //    * ```js
-  //    * let { GameObject } = kontra;
-  //    *
-  //    * let gameObject = GameObject({
-  //    *  x: 290,
-  //    *  y: 80,
-  //    *  width: 20,
-  //    *  height: 40,
-  //    *
-  //    *  render: function() {
-  //    *    // draw the game object normally (perform rotation and other transforms)
-  //    *    this.draw();
-  //    *
-  //    *    // outline the game object
-  //    *    this.context.strokeStyle = 'yellow';
-  //    *    this.context.lineWidth = 2;
-  //    *    this.context.strokeRect(0, 0, this.width, this.height);
-  //    *  }
-  //    * });
-  //    *
-  //    * gameObject.render();
-  //    * ```
-  //    * @memberof GameObject
-  //    * @function draw
-  //    */
+    /**
+     * Draw the game object at its X and Y position, taking into account rotation, scale, and anchor.
+     *
+     * Do note that the canvas has been rotated and translated to the objects position (taking into account anchor), so {0,0} will be the top-left corner of the game object when drawing.
+     *
+     * If you override the game objects `render()` function with your own render function, you can call this function to draw the game object normally.
+     *
+     * ```js
+     * let { GameObject } = kontra;
+     *
+     * let gameObject = GameObject({
+     *  x: 290,
+     *  y: 80,
+     *  width: 20,
+     *  height: 40,
+     *
+     *  render: function() {
+     *    // draw the game object normally (perform rotation and other transforms)
+     *    this.draw();
+     *
+     *    // outline the game object
+     *    this.context.strokeStyle = 'yellow';
+     *    this.context.lineWidth = 2;
+     *    this.context.strokeRect(0, 0, this.width, this.height);
+     *  }
+     * });
+     *
+     * gameObject.render();
+     * ```
+     * @memberof GameObject
+     * @function draw
+     */
   public virtual void draw() { }
 
-  //   /**
-  //    * Sync property changes from the parent to the child
-  //    */
-  //   _pc() {
-  //     this._uw();
+    /**
+     * Sync property changes from the parent to the child
+     */
+  public void _pc() {
+      this._uw();
 
-  //     // @ifdef GAMEOBJECT_GROUP
-  //     this.children.map(child => child._pc());
-  //     // @endif
-  //   }
+      // @ifdef GAMEOBJECT_GROUP
+      this.children.ForEach(child => child._pc());
+      // @endif
+    }
 
   /**
    * X coordinate of the position vector.
@@ -400,7 +402,7 @@ public abstract partial class GameObject : Updatable {
     }
   }
 
-public double width {
+public double Width {
   // w = width
   get => this._w;
   set {
@@ -409,81 +411,79 @@ public double width {
   }
 }
 
-  //   get height() {
-  //     // h = height
-  //     return this._h;
-  //   }
+public double Height {
+  // h = height
+  get => this._h;
+  set {
+    this._h = value;
+    this._pc();
+  }
+}
 
-  //   set height(value) {
-  //     this._h = value;
-  //     this._pc();
-  //   }
+    /**
+     * Update world properties
+     */
+    public override void _uw() {
+      // don't update world properties until after the init has finished
+      if (!this._di) return;
 
-  //   /**
-  //    * Update world properties
-  //    */
-  //   _uw() {
-  //     // don't update world properties until after the init has finished
-  //     if (!this._di) return;
+      // @ifdef GAMEOBJECT_GROUP||GAMEOBJECT_OPACITY||GAMEOBJECT_ROTATION||GAMEOBJECT_SCALE
+      double _wx = 0,
+        _wy = 0,
 
-  //     // @ifdef GAMEOBJECT_GROUP||GAMEOBJECT_OPACITY||GAMEOBJECT_ROTATION||GAMEOBJECT_SCALE
-  //     let {
-  //       _wx = 0,
-  //       _wy = 0,
+        // @ifdef GAMEOBJECT_OPACITY
+        _wo = 1,
+        // @endif
 
-  //       // @ifdef GAMEOBJECT_OPACITY
-  //       _wo = 1,
-  //       // @endif
+        // @ifdef GAMEOBJECT_ROTATION
+        _wr = 0,
+        // @endif
 
-  //       // @ifdef GAMEOBJECT_ROTATION
-  //       _wr = 0,
-  //       // @endif
+        // @ifdef GAMEOBJECT_SCALE
+        _wsx = 1,
+        _wsy = 1;
+        // @endif
+      // TODO: } = this.parent || {};
+      // @endif
 
-  //       // @ifdef GAMEOBJECT_SCALE
-  //       _wsx = 1,
-  //       _wsy = 1
-  //       // @endif
-  //     } = this.parent || {};
-  //     // @endif
+      // wx = world x, wy = world y
+      this._wx = this.x;
+      this._wy = this.y;
 
-  //     // wx = world x, wy = world y
-  //     this._wx = this.x;
-  //     this._wy = this.y;
+      // ww = world width, wh = world height
+      this._ww = this.width;
+      this._wh = this.height;
 
-  //     // ww = world width, wh = world height
-  //     this._ww = this.width;
-  //     this._wh = this.height;
+      // @ifdef GAMEOBJECT_OPACITY
+      // wo = world opacity
+      this._wo = _wo * this.opacity;
+      // @endif
 
-  //     // @ifdef GAMEOBJECT_OPACITY
-  //     // wo = world opacity
-  //     this._wo = _wo * this.opacity;
-  //     // @endif
+      // @ifdef GAMEOBJECT_SCALE
+      // wsx = world scale x, wsy = world scale y
+      this._wsx = _wsx * this.scaleX;
+      this._wsy = _wsy * this.scaleY;
 
-  //     // @ifdef GAMEOBJECT_SCALE
-  //     // wsx = world scale x, wsy = world scale y
-  //     this._wsx = _wsx * this.scaleX;
-  //     this._wsy = _wsy * this.scaleY;
+      this._wx = this._wx * _wsx;
+      this._wy = this._wy * _wsy;
+      this._ww = this.width * this._wsx;
+      this._wh = this.height * this._wsy;
+      // @endif
 
-  //     this._wx = this._wx * _wsx;
-  //     this._wy = this._wy * _wsy;
-  //     this._ww = this.width * this._wsx;
-  //     this._wh = this.height * this._wsy;
-  //     // @endif
+      // @ifdef GAMEOBJECT_ROTATION
+      // wr = world rotation
+      this._wr = _wr + this.rotation;
 
-  //     // @ifdef GAMEOBJECT_ROTATION
-  //     // wr = world rotation
-  //     this._wr = _wr + this.rotation;
+      let { x, y } = rotatePoint({ x: this._wx, y: this._wy }, _wr);
+      this._wx = x;
+      this._wy = y;
+      // @endif
 
-  //     let { x, y } = rotatePoint({ x: this._wx, y: this._wy }, _wr);
-  //     this._wx = x;
-  //     this._wy = y;
-  //     // @endif
-
-  //     // @ifdef GAMEOBJECT_GROUP
-  //     this._wx += _wx;
-  //     this._wy += _wy;
-  //     // @endif
-  //   }
+      // @ifdef GAMEOBJECT_GROUP
+      this._wx += _wx;
+      this._wy += _wy;
+      // @endif
+    }
 
   //   /**
   //    * The world position, width, height, opacity, rotation, and scale. The world property is the true position, width, height, etc. of the object, taking into account all parents.
@@ -627,42 +627,43 @@ public double width {
   //   }
   //   // @endif
 
-  //   // --------------------------------------------------
-  //   // scale
-  //   // --------------------------------------------------
+    // --------------------------------------------------
+    // scale
+    // --------------------------------------------------
 
-  //   // @ifdef GAMEOBJECT_SCALE
-  //   /**
-  //    * Set the x and y scale of the object. If only one value is passed, both are set to the same value.
-  //    * @memberof GameObject
-  //    * @function setScale
-  //    *
-  //    * @param {Number} x - X scale value.
-  //    * @param {Number} [y=x] - Y scale value.
-  //    */
-  //   setScale(x, y = x) {
-  //     this.scaleX = x;
-  //     this.scaleY = y;
-  //   }
+    // @ifdef GAMEOBJECT_SCALE
+    /**
+     * Set the x and y scale of the object. If only one value is passed, both are set to the same value.
+     * @memberof GameObject
+     * @function setScale
+     *
+     * @param {Number} x - X scale value.
+     * @param {Number} [y=x] - Y scale value.
+     */
+    public void setScale(double scale)
+      => setScale(x: scale, y:scale);
+    public void setScale(double x, double y) {
+      this.scaleX = x;
+      this.scaleY = y;
+    }
 
-  //   get scaleX() {
-  //     return this._scx;
-  //   }
+    public double ScaleX {
+      get => this._scx;
+      set => {
+        this._scx = value;
+        this._pc();
+      }
+    }
 
-  //   set scaleX(value) {
-  //     this._scx = value;
-  //     this._pc();
-  //   }
-
-  //   get scaleY() {
-  //     return this._scy;
-  //   }
-
-  //   set scaleY(value) {
-  //     this._scy = value;
-  //     this._pc();
-  //   }
-  //   // @endif
+    public double ScaleY {
+      get => this._scy;
+      set => {
+        this._scy = value;
+        this._pc();
+      }
+    }
+    
+    // @endif
 }
 
 // export default function factory() {
@@ -674,7 +675,7 @@ public abstract partial class GameObject {
   private object[] _c;
   private double Width { get; init; }
   private double Height { get; init; }
-  private Context context { get; init; }
+  private Context Context { get; init; }
   private Point Anchor { get; init; }
   private double Opacity { get; init; }
   private double Rotation { get; init; }
@@ -682,10 +683,9 @@ public abstract partial class GameObject {
   private double ScaleY { get; init; }
 
 
-  // private readonly bool _di;
+  private readonly bool _di;
   private List<GameObject> children { get; init; } = [];
 
-  public abstract void _uw();
   public abstract void addChild(IEnumerable<GameObject> children);
 
   public readonly Action _rf;

@@ -1,9 +1,10 @@
 {
     // Commented out the image to speed codespace creation
-    "image": "mcr.microsoft.com/devcontainers/universal:2.5.1",
+    //"image": "mcr.microsoft.com/devcontainers/universal:2.5.1",
+    "image": "mcr.microsoft.com/devcontainers/dotnet:dev-8.0",
 
     // Run Bash script in .devcontainer directory
-    "postCreateCommand": "/bin/bash ./.devcontainer/post-create.sh > ./.devcontainer/post-create.log",
+    //"postCreateCommand": "/bin/bash ./.devcontainer/post-create.sh > ./.devcontainer/post-create.log",
     
     "otherPortsAttributes": {
         "onAutoForward": "ignore"

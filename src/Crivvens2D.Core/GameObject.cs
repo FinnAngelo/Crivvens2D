@@ -229,7 +229,7 @@ public abstract partial class GameObject : Updatable {
     this._uw();
 
     // @ifdef GAMEOBJECT_GROUP
-    this.addChild(children);
+    this.AddChild(children);
     // @endif
 
     // rf = render function
@@ -368,7 +368,7 @@ public abstract partial class GameObject : Updatable {
     /**
      * Sync property changes from the parent to the child
      */
-  public override void _pc() {
+  public override void _pc(){
       this._uw();
 
       // @ifdef GAMEOBJECT_GROUP
@@ -494,8 +494,8 @@ public double Height {
      * @property {{x: Number, y: Number, width: Number, height: Number, opacity: Number, rotation: Number, scaleX: Number, scaleY: Number}} world
      * @memberof GameObject
      */
-    get world() {
-      return (
+    public object World {
+      get => (
         x: this._wx,
         y: this._wy,
         width: this._ww,
@@ -523,8 +523,8 @@ public double Height {
     // @ifdef GAMEOBJECT_GROUP
     public List<GameObject> Children {
       set {
-      this.removeChild(this._c);
-      this.addChild(value);
+      this.RemoveChild(this._c);
+      this.AddChild(value);
     }
     get => this._c;
     }
@@ -572,11 +572,11 @@ public double Height {
      *
      * parent.render();
      */
-     public void addChild(List<GameObject> objects)
+     public void AddChild(List<GameObject> objects) {
       objects.ForEach(child => {
-        this.children.Add(child);
-        child.parent = this;
-        child._pc = child._pc ?? noop;
+        this.Children.Add(child);
+        child.Parent = this;
+        //child._pc = child._pc ?? Utils.noop;
         child._pc();
       });
     }
@@ -588,10 +588,11 @@ public double Height {
      *
      * @param {...(GameObject|GameObject[])[]} objects - Object to remove as a child. Can be a single object, an array of objects, or a comma-separated list of objects.
      */
-    removeChild(...objects) {
-      objects.flat().map(child => {
-        if (removeFromArray(this.children, child)) {
-          child.parent = null;
+    public void RemoveChild(List<GameObject> objects) {
+      ArgumentNullException.ThrowIfNull(objects);
+      objects.ForEach (child => {
+        if(Utils.RemoveFromArray(this.Children, child)) {
+          child.Parent = null;
           child._pc();
         }
       });
@@ -671,7 +672,8 @@ public double Height {
 // export { GameObject as GameObjectClass };
 
 public abstract partial class GameObject {
-  private  List<GameObject> _c;
+  private GameObject? Parent {get;set;}
+  private readonly List<GameObject> _c = [];
   private Context Context { get; init; }
   private Point Anchor { get; init; }
 

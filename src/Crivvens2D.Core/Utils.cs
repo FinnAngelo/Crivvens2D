@@ -21,8 +21,7 @@ public static class Utils {
    *
    * @returns {Boolean|undefined} True if the item was removed.
    */
-  [Obsolete("removeFromArray - just use the c# Remove(item)", false)]
-  public static bool removeFromArray<T>(ICollection<T> array, T item) {
+  public static bool RemoveFromArray<T>(ICollection<T> array, T item) {
     return array.Remove(item);
   }
 }

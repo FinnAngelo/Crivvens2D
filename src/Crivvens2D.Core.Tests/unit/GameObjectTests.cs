@@ -2,6 +2,7 @@
 // import { _reset, init, getContext } from '../../src/core.js';
 // import { noop } from '../../src/utils.js';
 // import { degToRad } from '../../src/helpers.js';
+
 namespace Crivvens2D.Core.Tests;
 // // test-context:start
 // let testContext = {
@@ -42,18 +43,20 @@ public class GameObjectTests {
 
     [TestMethod]
     public void New_HasDefaultPosition() {
+        var context = Mock.Of<Context>();
         var gameObject = new Mock<GameObject>(
-            null!,
-            null!,
-            null!,
-            null!,
-            null!,
-            null!,
-            null!,
-            null!,
-            null!,
-            null!,
-            null!).Object;
+            null!, // double width
+            null!, // double height
+            context, // Context context
+            null!, // Action render
+            null!, // Action<double> update
+            null!, // List<GameObject> children
+            null!, // Point anchor
+            null!, // double opacity
+            null!, // double rotation
+            null!, // double scaleX
+            null!  // double scaleY
+			).Object;
         gameObject.Width.Should().Be(0);
         gameObject.Height.Should().Be(0);
     }

@@ -573,7 +573,7 @@ public double Height {
      * parent.render();
      */
      public void AddChild(List<GameObject> objects) {
-      objects.ForEach(child => {
+      objects?.ForEach(child => {
         this.Children.Add(child);
         child.Parent = this;
         //child._pc = child._pc ?? Utils.noop;

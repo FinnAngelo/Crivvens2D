@@ -1,6 +1,6 @@
 public static class Utils {
 
-  public static void noop() { }
+  public static readonly Action noop = () => { };
 
   // style used for DOM nodes needed for screen readers
   // DOTNETIFY: No Dom

@@ -56,45 +56,69 @@ public class GameObjectTests {
             null!, // double rotation
             null!, // double scaleX
             null!  // double scaleY
-			).Object;
+            ).Object;
         gameObject.Width.Should().Be(0);
         gameObject.Height.Should().Be(0);
     }
 
+    [TestMethod]
+    public void New_SetWidthAndHeight() {
+        var context = Mock.Of<Context>();
+        var gameObject = new Mock<GameObject>(
+            10, // double width
+            20, // double height
+            context, // Context context
+            null!, // Action render
+            null!, // Action<double> update
+            null!, // List<GameObject> children
+            null!, // Point anchor
+            null!, // double opacity
+            null!, // double rotation
+            null!, // double scaleX
+            null!  // double scaleY
+            ).Object;
+        gameObject.Width.Should().Be(10);
+        gameObject.Height.Should().Be(20);
+    }
 
-    //     describe('init', () => {
-    //       it('should set default properties', () => {
-    //         expect(gameObject.context).to.equal(getContext());
-    //         expect(gameObject.width).to.equal(0);
-    //         expect(gameObject.height).to.equal(0);
-    //       });
-
-    //       it('should set width and height properties', () => {
-    //         gameObject = GameObject({ width: 10, height: 20 });
-
-    //         expect(gameObject.width).to.equal(10);
-    //         expect(gameObject.height).to.equal(20);
-    //       });
-
-    //       it('should set context property', () => {
-    //         let canvas = document.createElement('canvas');
-    //         let context = canvas.getContext('2d');
-    //         gameObject = GameObject({ context });
-
-    //         expect(gameObject.context).to.equal(context);
-    //       });
-
-    //       it('should set any property', () => {
-    //         gameObject = GameObject({ myProp: 'foo' });
-
-    //         expect(gameObject.myProp).to.equal('foo');
-    //       });
-
-    //       it('should set render function', () => {
-    //         gameObject = GameObject({ render: noop });
-
-    //         expect(gameObject._rf).to.equal(noop);
-    //       });
+    [TestMethod]
+    public void New_SetContext() {
+        var context = Mock.Of<Context>();
+        var gameObject = new Mock<GameObject>(
+            null!, // double width
+            null!, // double height
+            context, // Context context
+            null!, // Action render
+            null!, // Action<double> update
+            null!, // List<GameObject> children
+            null!, // Point anchor
+            null!, // double opacity
+            null!, // double rotation
+            null!, // double scaleX
+            null!  // double scaleY
+            ).Object;
+        gameObject.Context.Should().Be(context);
+    }
+    
+    //       it('should set any property', () => NOPE!;
+        [TestMethod]
+    public void New_SetRenderFunction() {
+        var context = Mock.Of<Context>();
+        var gameObject = new Mock<GameObject>(
+            null!, // double width
+            null!, // double height
+            context, // Context context
+            Utils.noop, // Action render
+            null!, // Action<double> update
+            null!, // List<GameObject> children
+            null!, // Point anchor
+            null!, // double opacity
+            null!, // double rotation
+            null!, // double scaleX
+            null!  // double scaleY
+            ).Object;
+        gameObject._rf.Should().BeSameAs(Utils.noop);
+    }
 
     //       it('should not override properties from parent object', () => {
     //         class MyClass extends GameObjectClass {

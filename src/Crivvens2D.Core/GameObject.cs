@@ -674,7 +674,7 @@ public double Height {
 public abstract partial class GameObject {
   private GameObject? Parent {get;set;}
   private readonly List<GameObject> _c = [];
-  private Context Context { get; init; }
+  internal Context Context { get; init; }
   private Point Anchor { get; init; }
 
 

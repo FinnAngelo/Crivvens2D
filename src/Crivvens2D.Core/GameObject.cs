@@ -188,7 +188,6 @@ public abstract partial class GameObject : Updatable {
 
   //...props
   ) {
-    if(context == null) throw new ArgumentException(nameof(context));
     ArgumentNullException.ThrowIfNull(context, nameof(context));
     // @ifdef GAMEOBJECT_GROUP
     this._c = new List<GameObject>();
@@ -233,10 +232,10 @@ public abstract partial class GameObject : Updatable {
     // @endif
 
     // rf = render function
-    this._rf = render;
+    this._rf = render ?? this.draw;
 
     // uf = update function
-    this._uf = update;
+    this._uf = update ?? base.Advance;
 
     On("init", () => {
       //this.context ??= getContext();

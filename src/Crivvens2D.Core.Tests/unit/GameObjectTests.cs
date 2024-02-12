@@ -99,9 +99,9 @@ public class GameObjectTests {
             ).Object;
         gameObject.Context.Should().Be(context);
     }
-    
+
     //       it('should set any property', () => NOPE!;
-        [TestMethod]
+    [TestMethod]
     public void New_SetRenderFunction() {
         var context = Mock.Of<Context>();
         var gameObject = new Mock<GameObject>(
@@ -135,33 +135,11 @@ public class GameObjectTests {
     //         expect(obj.height).to.equal(30);
     //       });
 
-    //       it('should set context if kontra.init is called after created', () => {
-    //         _reset();
+    //       it('should set context if kontra.init is called after created', () => Redundant now
 
-    //         gameObject = GameObject();
+    //         it('should not override context when set if kontra.init is called after created', () => Redundant now
 
-    //         expect(gameObject.context).to.be.undefined;
 
-    //         let canvas = document.createElement('canvas');
-    //         canvas.width = canvas.height = 600;
-    //         init(canvas);
-
-    //         expect(gameObject.context).to.equal(canvas.getContext('2d'));
-    //       });
-
-    //       it('should not override context when set if kontra.init is called after created', () => {
-    //         _reset();
-
-    //         gameObject = GameObject({ context: true });
-
-    //         let canvas = document.createElement('canvas');
-    //         canvas.width = canvas.height = 600;
-    //         init(canvas);
-
-    //         expect(gameObject.context).to.equal(true);
-    //       });
-
-    //       if (testContext.GAMEOBJECT_ANCHOR) {
     //         it('should set default anchor', () => {
     //           expect(gameObject.anchor).to.deep.equal({ x: 0, y: 0 });
     //         });
@@ -171,11 +149,7 @@ public class GameObjectTests {
 
     //           expect(gameObject.anchor).to.deep.equal({ x: 0.5, y: 0.5 });
     //         });
-    //       } else {
-    //         it('should not default anchor', () => {
-    //           expect(gameObject.anchor).to.not.exist;
-    //         });
-    //       }
+
 
     //       if (testContext.GAMEOBJECT_GROUP) {
     //         it('should set default children', () => {
